@@ -57,7 +57,8 @@ namespace JonesovaGui
                                     Description = d.GetValueOrDefault("description") as string,
                                     Exif = true.Equals(d.GetValueOrDefault("exif"))
                                 })
-                                .ToList()
+                                .ToList(),
+                            Content = indexContent
                         };
                     })
                     .ToList();
@@ -77,6 +78,7 @@ namespace JonesovaGui
         public string Thumb { get; set; }
         public IList<string> Categories { get; set; }
         public IList<Image> Images { get; set; }
+        public string Content { get; set; }
 
         public override string ToString()
         {
