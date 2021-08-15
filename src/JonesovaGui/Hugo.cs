@@ -24,7 +24,8 @@ namespace JonesovaGui
                     WorkingDirectory = window.repoPath,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
-                    UseShellExecute = false
+                    UseShellExecute = false,
+                    CreateNoWindow = true
                 };
 
                 window.previewButton.Click += PreviewButton_Click;

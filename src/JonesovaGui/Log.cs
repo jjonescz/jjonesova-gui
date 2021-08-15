@@ -15,7 +15,7 @@ namespace JonesovaGui
             file.WriteLine(line);
             file.Flush();
             if (Debugger.IsAttached)
-                Debug.WriteLine(line);
+                System.Diagnostics.Debug.WriteLine(line);
         }
 
         public static void Write(LogLevel level, string prefix, string message)
