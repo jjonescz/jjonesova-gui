@@ -5,8 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:JonesovaGui"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-
-    </Grid>
+        Title="MainWindow" Height="450" Width="800"
+        Loaded="Window_Loaded">
+    <StackPanel Orientation="Vertical">
+        <DockPanel>
+            <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Přihlášení</Label>
+            <Label x:Name="loginStatus" DockPanel.Dock="Left">Načítání...</Label>
+            <TextBox x:Name="tokenBox" VerticalAlignment="Center" Margin="12,0" Visibility="Collapsed"></TextBox>
+        </DockPanel>
+    </StackPanel>
 </Window>

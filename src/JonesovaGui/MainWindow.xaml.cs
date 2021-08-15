@@ -24,5 +24,11 @@ namespace JonesovaGui
         {
             InitializeComponent();
         }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            // TODO: Check Git repo.
+            loginStatus.Content = "Přihlášení úspěšné";
+        }
     }
 }
