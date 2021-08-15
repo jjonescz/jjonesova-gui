@@ -1,12 +1,11 @@
 ﻿using Markdig;
 using Markdig.Extensions.Yaml;
 using Markdig.Syntax;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Media;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -23,6 +22,7 @@ namespace JonesovaGui
             public Data(MainWindow window)
             {
                 this.window = window;
+                window.categories.SelectionChanged += Categories_SelectionChanged;
             }
 
             public void Load()
@@ -49,8 +49,8 @@ namespace JonesovaGui
                             Id = Path.GetFileName(p),
                             Title = dict.GetValueOrDefault("title") as string,
                             Thumb = dict.GetValueOrDefault("albumthumb") as string,
-                            Categories = dict.GetList<string>("categories"),
-                            Images = dict.GetItems<Dictionary<string, object>>("resources")
+                            Categories = dict.GetItems<string>("categories").Select(s => s.Trim()).ToList(),
+                            Images = dict.GetItems<Dictionary<object, object>>("resources")
                                 .Select(d => new Image
                                 {
                                     Src = d.GetValueOrDefault("src") as string,
@@ -67,6 +67,32 @@ namespace JonesovaGui
                 window.categories.ItemsSource = categories;
                 window.categoriesStatus.Visibility = Visibility.Collapsed;
                 window.categories.Visibility = Visibility.Visible;
+
+                NoCategorySelected();
+            }
+
+            private void Categories_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+            {
+                var category = window.categories.SelectedItem as string;
+                if (category == null)
+                {
+                    NoCategorySelected();
+                }
+                else
+                {
+                    window.albumsStatus.Visibility = Visibility.Collapsed;
+                    window.albums.ItemsSource = albums
+                        .Where(a => a.Categories.Contains(category)).ToList();
+                    window.albums.Visibility = Visibility.Visible;
+                }
+            }
+
+            private void NoCategorySelected()
+            {
+                window.albumsStatus.Content = "Nejprve vyberte kategorii";
+                window.albumsStatus.Foreground = Brushes.Black;
+                window.albumsStatus.Visibility = Visibility.Visible;
+                window.albums.Visibility = Visibility.Collapsed;
             }
         }
     }
@@ -100,17 +126,10 @@ namespace JonesovaGui
 
     static class DictExtensions
     {
-        public static IList<T> GetList<T>(this Dictionary<string, object> dict, string key)
-        {
-            if (dict.TryGetValue(key, out var value) && value is IList list)
-                return list.Cast<T>().ToList();
-            return Array.Empty<T>();
-        }
-
         public static IEnumerable<T> GetItems<T>(this Dictionary<string, object> dict, string key)
         {
-            if (dict.TryGetValue(key, out var value) && value is IEnumerable<T> items)
-                return items;
+            if (dict.TryGetValue(key, out var value))
+                return (value as IEnumerable<object>).Cast<T>();
             return Enumerable.Empty<T>();
         }
     }

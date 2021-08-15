@@ -23,5 +23,10 @@
             <Label x:Name="categoriesStatus" DockPanel.Dock="Left" Foreground="Gray">Čeká...</Label>
             <ComboBox x:Name="categories" IsEditable="True" Margin="0,0,12,0" VerticalAlignment="Center" Visibility="Collapsed"></ComboBox>
         </DockPanel>
+        <DockPanel>
+            <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Album</Label>
+            <Label x:Name="albumsStatus" DockPanel.Dock="Left" Foreground="Gray">Čeká...</Label>
+            <ComboBox x:Name="albums" IsEditable="True" Margin="0,0,12,0" VerticalAlignment="Center" Visibility="Collapsed"></ComboBox>
+        </DockPanel>
     </StackPanel>
 </Window>
