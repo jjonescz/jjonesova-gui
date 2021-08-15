@@ -10,8 +10,8 @@
     <StackPanel Orientation="Vertical">
         <DockPanel>
             <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Přihlášení</Label>
-            <Label x:Name="loginStatus" DockPanel.Dock="Left">Načítání...</Label>
-            <TextBox x:Name="tokenBox" VerticalAlignment="Center" Margin="12,0" Visibility="Collapsed"></TextBox>
+            <Label x:Name="loginStatus" DockPanel.Dock="Left" Foreground="DarkOrange">Načítání...</Label>
+            <TextBox x:Name="tokenBox" VerticalAlignment="Center" Margin="12,0" Visibility="Collapsed" TextChanged="tokenBox_TextChanged"></TextBox>
         </DockPanel>
     </StackPanel>
 </Window>
