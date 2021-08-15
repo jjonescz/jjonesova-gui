@@ -48,7 +48,16 @@ namespace JonesovaGui
                         {
                             Id = Path.GetFileName(p),
                             Title = dict.GetValueOrDefault("title") as string,
-                            Categories = dict.GetList<string>("categories")
+                            Thumb = dict.GetValueOrDefault("albumthumb") as string,
+                            Categories = dict.GetList<string>("categories"),
+                            Images = dict.GetItems<Dictionary<string, object>>("resources")
+                                .Select(d => new Image
+                                {
+                                    Src = d.GetValueOrDefault("src") as string,
+                                    Description = d.GetValueOrDefault("description") as string,
+                                    Exif = true.Equals(d.GetValueOrDefault("exif"))
+                                })
+                                .ToList()
                         };
                     })
                     .ToList();
@@ -65,7 +74,16 @@ namespace JonesovaGui
     {
         public string Id { get; set; }
         public string Title { get; set; }
+        public string Thumb { get; set; }
         public IList<string> Categories { get; set; }
+        public IList<Image> Images { get; set; }
+    }
+
+    class Image
+    {
+        public string Src { get; set; }
+        public string Description { get; set; }
+        public bool Exif { get; set; }
     }
 
     static class DictExtensions
@@ -75,6 +93,13 @@ namespace JonesovaGui
             if (dict.TryGetValue(key, out var value) && value is IList list)
                 return list.Cast<T>().ToList();
             return Array.Empty<T>();
+        }
+
+        public static IEnumerable<T> GetItems<T>(this Dictionary<string, object> dict, string key)
+        {
+            if (dict.TryGetValue(key, out var value) && value is IEnumerable<T> items)
+                return items;
+            return Enumerable.Empty<T>();
         }
     }
 }
