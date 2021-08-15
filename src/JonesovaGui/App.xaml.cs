@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 
 namespace JonesovaGui
 {
@@ -13,5 +7,14 @@ namespace JonesovaGui
     /// </summary>
     public partial class App : Application
     {
+        private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            Log.Flush();
+        }
+
+        private void Application_Exit(object sender, ExitEventArgs e)
+        {
+            Log.Flush();
+        }
     }
 }
