@@ -77,6 +77,11 @@ namespace JonesovaGui
         public string Thumb { get; set; }
         public IList<string> Categories { get; set; }
         public IList<Image> Images { get; set; }
+
+        public override string ToString()
+        {
+            return Title;
+        }
     }
 
     class Image
@@ -84,6 +89,11 @@ namespace JonesovaGui
         public string Src { get; set; }
         public string Description { get; set; }
         public bool Exif { get; set; }
+
+        public override string ToString()
+        {
+            return Src;
+        }
     }
 
     static class DictExtensions
