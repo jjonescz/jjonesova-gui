@@ -109,7 +109,7 @@ namespace JonesovaGui
 
             private void OpenPreview()
             {
-                //Process.Start(address);
+                Process.Start(new ProcessStartInfo(address) { UseShellExecute = true });
             }
         }
     }
