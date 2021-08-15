@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using System.Windows.Media;
 
 namespace JonesovaGui
@@ -16,6 +13,7 @@ namespace JonesovaGui
             private readonly MainWindow window;
             private readonly ProcessStartInfo hugoStart;
             private Process process;
+            private string address;
 
             public Hugo(MainWindow window)
             {
@@ -23,35 +21,73 @@ namespace JonesovaGui
                 var hugoPath = Path.GetFullPath("Assets/hugo.exe");
                 hugoStart = new ProcessStartInfo(hugoPath, "server")
                 {
-                    WorkingDirectory = window.repoPath
+                    WorkingDirectory = window.repoPath,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false
                 };
 
                 window.previewButton.Click += PreviewButton_Click;
+                window.Closing += Window_Closing;
+            }
+
+            private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+            {
+                process?.Kill();
             }
 
             public void Start()
             {
-                process = Process.Start(hugoStart);
+                _ = window.Dispatcher.InvokeAsync(() =>
+                {
+                    window.previewStatus.Content = "Načítání...";
+                    window.previewStatus.Foreground = Brushes.DarkOrange;
+                });
+
+                process = new Process();
                 process.OutputDataReceived += Process_OutputDataReceived;
                 process.ErrorDataReceived += Process_ErrorDataReceived;
                 process.Exited += Process_Exited;
+                process.StartInfo = hugoStart;
+                process.Start();
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+                _ = process.WaitForExitAsync();
             }
 
             private void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
             {
+                var match = Regex.Match(e.Data ?? string.Empty, @"Web Server is available at (\S+)");
+                if (match.Success)
+                {
+                    var oldAddress = address;
+                    address = match.Groups[1].Value;
+                    if (!string.Equals(address, oldAddress))
+                    { 
+                        OpenPreview();
+                        _ = window.Dispatcher.InvokeAsync(() =>
+                        {
+                            window.previewStatus.Content = $"Načteno ({address})";
+                            window.previewStatus.Foreground = Brushes.Black;
+                        });
+                    }
+                }
             }
 
             private void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
             {
                 _ = window.Dispatcher.InvokeAsync(() =>
                 {
-                    window.previewStatus.Content = $"Chyba: ${e.Data}";
+                    window.previewStatus.Content = $"Chyba: {e.Data}";
                     window.previewStatus.Foreground = Brushes.DarkRed;
                 });
             }
 
             private void Process_Exited(object sender, EventArgs e)
             {
+                address = null;
+                process = null;
+
                 _ = window.Dispatcher.InvokeAsync(() =>
                 {
                     window.previewStatus.Content = $"Neaktivní";
@@ -61,6 +97,19 @@ namespace JonesovaGui
 
             private void PreviewButton_Click(object sender, System.Windows.RoutedEventArgs e)
             {
+                if (address != null)
+                {
+                    OpenPreview();
+                }
+                else
+                {
+                    Start();
+                }
+            }
+
+            private void OpenPreview()
+            {
+                //Process.Start(address);
             }
         }
     }

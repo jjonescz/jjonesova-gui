@@ -16,7 +16,7 @@
         <DockPanel>
             <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Náhled</Label>
             <Label x:Name="previewStatus" DockPanel.Dock="Left"></Label>
-            <Button x:Name="previewButton" DockPanel.Dock="Right" HorizontalAlignment="Right" Padding="12,0">Zobrazit</Button>
+            <Button x:Name="previewButton" DockPanel.Dock="Right" HorizontalAlignment="Right" Padding="12,0" Margin="12,0">Zobrazit</Button>
         </DockPanel>
     </StackPanel>
 </Window>
