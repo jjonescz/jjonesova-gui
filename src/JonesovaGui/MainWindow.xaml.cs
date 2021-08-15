@@ -1,6 +1,5 @@
 ﻿using LibGit2Sharp;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
@@ -27,7 +26,7 @@ namespace JonesovaGui
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             GlobalSettings.LogConfiguration = new LogConfiguration(LogLevel.Trace,
-                (level, message) => Log.Write(level, $"Git: {message}"));
+                (level, message) => Log.Write(level, "Git", message));
 
             // Load token if saved.
             if (File.Exists(tokenPath))

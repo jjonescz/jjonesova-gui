@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using LibGit2Sharp;
+using System.Windows;
 
 namespace JonesovaGui
 {
@@ -9,12 +10,12 @@ namespace JonesovaGui
     {
         private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            Log.Flush();
+            Log.Error("App", e.Exception.ToString());
         }
 
         private void Application_Exit(object sender, ExitEventArgs e)
         {
-            Log.Flush();
+            Log.Info("App", $"Exitting ({e.ApplicationExitCode})");
         }
     }
 }

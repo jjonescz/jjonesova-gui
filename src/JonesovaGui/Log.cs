@@ -13,10 +13,19 @@ namespace JonesovaGui
             file.WriteLine($"{level}: {message}");
             file.Flush();
         }
-
-        public static void Flush()
+        public static void Write(LogLevel level, string prefix, string message)
         {
-            file.Flush();
+            Write(level, $"{prefix}: {message}");
+        }
+
+        public static void Error(string prefix, string message)
+        {
+            Write(LogLevel.Error, prefix, message);
+        }
+
+        public static void Info(string prefix, string message)
+        {
+            Write(LogLevel.Info, prefix, message);
         }
 
         private static StreamWriter Open()
