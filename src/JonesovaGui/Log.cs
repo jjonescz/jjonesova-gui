@@ -1,5 +1,6 @@
 ﻿using LibGit2Sharp;
 using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace JonesovaGui
@@ -10,9 +11,13 @@ namespace JonesovaGui
 
         public static void Write(LogLevel level, string message)
         {
-            file.WriteLine($"{level}: {message}");
+            var line = $"{level}: {message}";
+            file.WriteLine(line);
             file.Flush();
+            if (Debugger.IsAttached)
+                Debug.WriteLine(line);
         }
+
         public static void Write(LogLevel level, string prefix, string message)
         {
             Write(level, $"{prefix}: {message}");
