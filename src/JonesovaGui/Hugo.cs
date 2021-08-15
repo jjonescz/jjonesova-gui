@@ -45,6 +45,11 @@ namespace JonesovaGui
                     window.previewStatus.Foreground = Brushes.DarkOrange;
                 });
 
+                // Kill existing hugo processes (can be there from previous
+                // debugging sessions even).
+                foreach (var old in Process.GetProcessesByName("hugo"))
+                    old.Kill();
+
                 process = new Process();
                 process.OutputDataReceived += Process_OutputDataReceived;
                 process.ErrorDataReceived += Process_ErrorDataReceived;
