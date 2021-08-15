@@ -30,6 +30,9 @@ namespace JonesovaGui
 
             // Execute Hugo.
             new Hugo(this).Start();
+
+            // Load content.
+            new Data(this).Load();
         }
 
         private void tokenBox_TextChanged(object sender, TextChangedEventArgs e)

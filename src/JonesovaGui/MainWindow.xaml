@@ -15,8 +15,13 @@
         </DockPanel>
         <DockPanel>
             <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Náhled</Label>
-            <Label x:Name="previewStatus" DockPanel.Dock="Left"></Label>
+            <Label x:Name="previewStatus" DockPanel.Dock="Left" Foreground="Gray">Čeká...</Label>
             <Button x:Name="previewButton" DockPanel.Dock="Right" HorizontalAlignment="Right" Padding="12,0" Margin="12,0">Zobrazit</Button>
+        </DockPanel>
+        <DockPanel>
+            <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Kategorie</Label>
+            <Label x:Name="categoriesStatus" DockPanel.Dock="Left" Foreground="Gray">Čeká...</Label>
+            <ComboBox x:Name="categories" IsEditable="True" Margin="0,0,12,0" VerticalAlignment="Center" Visibility="Collapsed"></ComboBox>
         </DockPanel>
     </StackPanel>
 </Window>
