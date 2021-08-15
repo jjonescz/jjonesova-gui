@@ -11,7 +11,7 @@ namespace JonesovaGui
 
         public static void Write(LogLevel level, string message)
         {
-            var line = $"{level}: {message}";
+            var line = $"{level} ({DateTime.UtcNow:O}): {message}";
             file.WriteLine(line);
             file.Flush();
             if (Debugger.IsAttached)
@@ -31,6 +31,11 @@ namespace JonesovaGui
         public static void Info(string prefix, string message)
         {
             Write(LogLevel.Info, prefix, message);
+        }
+
+        public static void Debug(string prefix, string message)
+        {
+            Write(LogLevel.Debug, prefix, message);
         }
 
         private static StreamWriter Open()

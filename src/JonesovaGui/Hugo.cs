@@ -57,6 +57,8 @@ namespace JonesovaGui
 
             private void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
             {
+                Log.Info("Hugo", $"Stdout: {e.Data}");
+
                 var match = Regex.Match(e.Data ?? string.Empty, @"Web Server is available at (\S+)");
                 if (match.Success)
                 {
@@ -76,6 +78,8 @@ namespace JonesovaGui
 
             private void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
             {
+                Log.Error("Hugo", $"Stderr: {e.Data}");
+
                 _ = window.Dispatcher.InvokeAsync(() =>
                 {
                     window.previewStatus.Content = $"Chyba: {e.Data}";
@@ -85,6 +89,8 @@ namespace JonesovaGui
 
             private void Process_Exited(object sender, EventArgs e)
             {
+                Log.Info("Hugo", $"Exited: {process.ExitCode}");
+
                 address = null;
                 process = null;
 
@@ -109,6 +115,7 @@ namespace JonesovaGui
 
             private void OpenPreview()
             {
+                Log.Debug("Hugo", $"Opening address {address}");
                 Process.Start(new ProcessStartInfo(address) { UseShellExecute = true });
             }
         }
