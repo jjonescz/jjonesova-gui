@@ -13,5 +13,10 @@
             <Label x:Name="loginStatus" DockPanel.Dock="Left" Foreground="DarkOrange">Načítání...</Label>
             <TextBox x:Name="tokenBox" VerticalAlignment="Center" Margin="12,0" Visibility="Collapsed" TextChanged="tokenBox_TextChanged"></TextBox>
         </DockPanel>
+        <DockPanel>
+            <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Náhled</Label>
+            <Label x:Name="previewStatus" DockPanel.Dock="Left"></Label>
+            <Button x:Name="previewButton" DockPanel.Dock="Right" HorizontalAlignment="Right" Padding="12,0">Zobrazit</Button>
+        </DockPanel>
     </StackPanel>
 </Window>

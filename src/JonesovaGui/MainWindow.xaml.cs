@@ -1,5 +1,6 @@
 ﻿using LibGit2Sharp;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,11 +14,12 @@ namespace JonesovaGui
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly string tokenPath;
+        private readonly string tokenPath, repoPath;
 
         public MainWindow()
         {
             tokenPath = Path.GetFullPath("jjonesova.cz/token.txt");
+            repoPath = Path.GetFullPath("jjonesova.cz/repo");
 
             InitializeComponent();
         }
@@ -29,7 +31,6 @@ namespace JonesovaGui
                 tokenBox.Text = File.ReadAllText(tokenPath);
 
             // Check Git repo.
-            var repoPath = Path.GetFullPath("jjonesova.cz/repo");
             Directory.CreateDirectory(repoPath);
             try
             {
@@ -42,7 +43,8 @@ namespace JonesovaGui
                         CredentialsProvider = Credentials,
                         OnProgress = p => Status("Přihlašování", p),
                         OnTransferProgress = p => Status("Přihlašování", p),
-                        OnCheckoutProgress = (p, c, t) => Status("Přihlašování", $"Checkout: {(double)c / t:p}")
+                        OnCheckoutProgress = (p, c, t) => Status("Přihlašování", $"Checkout: {(double)c / t:p}"),
+                        RecurseSubmodules = true
                     }));
                 }
                 else
@@ -56,7 +58,7 @@ namespace JonesovaGui
                         {
                             CredentialsProvider = Credentials,
                             OnProgress = p => Status("Přihlašování", p),
-                            OnTransferProgress = p => Status("Přihlašování", p),
+                            OnTransferProgress = p => Status("Přihlašování", p)
                         }
                     }));
                     if (result.Status == MergeStatus.Conflicts)
@@ -79,6 +81,9 @@ namespace JonesovaGui
             loginStatus.Content = "Přihlášení úspěšné";
             loginStatus.Foreground = Brushes.Black;
             tokenBox.Visibility = Visibility.Collapsed;
+
+            // Execute Hugo.
+            new Hugo(this).Start();
         }
 
         private void tokenBox_TextChanged(object sender, TextChangedEventArgs e)
