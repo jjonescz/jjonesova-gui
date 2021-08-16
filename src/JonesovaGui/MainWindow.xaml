@@ -27,7 +27,8 @@
         </DockPanel>
         <StackPanel Grid.Row="2" Orientation="Horizontal">
             <Label Margin="0,0,6,0" FontWeight="Bold">Změny</Label>
-            <Button x:Name="saveButton" Padding="12,0" Margin="6,0" IsEnabled="False">Uložit</Button>
+            <Button x:Name="saveButton" Padding="12,0" Margin="6,0" IsEnabled="True">Uložit</Button>
+            <Button x:Name="backupButton" Padding="12,0" Margin="6,0" IsEnabled="False">Zálohovat</Button>
             <Button x:Name="restoreButton" Padding="12,0" Margin="6,0" IsEnabled="False">Obnovit předchozí zálohu...</Button>
         </StackPanel>
         <DockPanel Grid.Row="3">

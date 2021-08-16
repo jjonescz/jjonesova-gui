@@ -22,6 +22,7 @@ namespace JonesovaGui
                 GlobalSettings.LogConfiguration = new LogConfiguration(LogLevel.Trace,
                     (level, message) => Log.Write(level, "Git", message));
 
+                window.backupButton.Click += BackupButton_Click;
                 window.restoreButton.Click += RestoreButton_Click;
             }
 
@@ -48,8 +49,7 @@ namespace JonesovaGui
                     {
                         // Pull repository.
                         repo = new Repository(window.repoPath);
-                        var signature = new Signature("Jan Joneš", "jjones@outlook.cz", DateTimeOffset.Now);
-                        var result = await Task.Run(() => Commands.Pull(repo, signature, new PullOptions
+                        var result = await Task.Run(() => Commands.Pull(repo, GetSignature(), new PullOptions
                         {
                             FetchOptions = new FetchOptions
                             {
@@ -107,6 +107,21 @@ namespace JonesovaGui
                 };
             }
 
+            private Signature GetSignature()
+            {
+                return new Signature("Admin GUI", "admin@jjonesova.cz", DateTimeOffset.Now);
+            }
+
+            private void BackupButton_Click(object sender, RoutedEventArgs e)
+            {
+                Log.Info("Git", "Committing changes");
+                Commands.Stage(repo, "*");
+                var commit = repo.Commit("Apply changes from admin GUI", GetSignature(), GetSignature());
+                Log.Debug("Git", $"Committed as {commit.Sha}");
+                RefreshStatus();
+                window.backupButton.Content = "✔ Zálohováno";
+            }
+
             private void RestoreButton_Click(object sender, RoutedEventArgs e)
             {
                 var changes = repo.RetrieveStatus().Count();
@@ -120,7 +135,8 @@ namespace JonesovaGui
                 {
                     Log.Info("Git", $"Resetting repository ({changes} changes)");
                     repo.Reset(ResetMode.Hard);
-                    window.restoreButton.IsEnabled = false;
+                    Log.Debug("Git", $"Repository at commit {repo.Head.Tip.Sha}");
+                    RefreshStatus();
                     window.restoreButton.Content = "✔ Obnoveno";
                     window.data.Load();
                 }
@@ -134,6 +150,11 @@ namespace JonesovaGui
                     window.restoreButton.Content = "Obnovit předchozí zálohu...";
                 }
                 window.restoreButton.IsEnabled = dirty;
+                if (dirty && !window.backupButton.IsEnabled)
+                {
+                    window.backupButton.Content = "Zálohovat";
+                }
+                window.backupButton.IsEnabled = dirty;
             }
         }
     }
