@@ -272,6 +272,7 @@ namespace JonesovaGui
                 }
                 if (anyChanged)
                 {
+                    Log.Debug("Git", "Refreshing list UI");
                     window.albums.Items.Refresh();
                     window.images.Items.Refresh();
                 }

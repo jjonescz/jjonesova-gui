@@ -537,10 +537,11 @@ namespace JonesovaGui
                 {
                     window.saveButton.IsEnabled = false;
                     window.saveButton.Content = "✔ Uloženo";
-                    window.git.RefreshStatus();
 
                     // Refresh content.
                     Load();
+
+                    window.git.RefreshStatus();
                 });
             }
 
