@@ -1,6 +1,7 @@
 ﻿using Markdig;
 using Markdig.Extensions.Yaml;
 using Markdig.Syntax;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -39,30 +40,19 @@ namespace JonesovaGui
                     .Select(p =>
                     {
                         var indexPath = Path.Combine(p, "_index.md");
+                        Log.Debug("Data", $"Deserializing {indexPath}");
                         var indexContent = File.ReadAllText(indexPath);
                         var markdown = Markdown.Parse(indexContent, pipeline);
                         var yaml = markdown.Descendants<YamlFrontMatterBlock>()
                             .Single().Lines.ToString();
-                        var dict = deserializer.Deserialize<Dictionary<string, object>>(yaml);
                         return new Album
                         {
-                            Id = Path.GetFileName(p),
-                            Title = dict.GetValueOrDefault("title") as string,
-                            Thumb = dict.GetValueOrDefault("albumthumb") as string,
-                            Categories = dict.GetItems<string>("categories").Select(s => s.Trim()).ToList(),
-                            Images = dict.GetItems<Dictionary<object, object>>("resources")
-                                .Select(d => new Image
-                                {
-                                    Src = d.GetValueOrDefault("src") as string,
-                                    Description = d.GetValueOrDefault("description") as string,
-                                    Exif = true.Equals(d.GetValueOrDefault("exif"))
-                                })
-                                .ToList(),
+                            Info = deserializer.Deserialize<AlbumInfo>(yaml),
                             Content = indexContent
                         };
                     })
                     .ToList();
-                categories = albums.SelectMany(a => a.Categories).Distinct().ToList();
+                categories = albums.SelectMany(a => a.Info.Categories).Distinct().ToList();
 
                 window.categories.ItemsSource = categories;
                 window.categoriesStatus.Visibility = Visibility.Collapsed;
@@ -82,7 +72,7 @@ namespace JonesovaGui
                 {
                     window.albumsStatus.Visibility = Visibility.Collapsed;
                     window.albums.ItemsSource = albums
-                        .Where(a => a.Categories.Contains(category)).ToList();
+                        .Where(a => a.Info.Categories.Contains(category)).ToList();
                     window.albums.Visibility = Visibility.Visible;
                 }
             }
@@ -99,22 +89,29 @@ namespace JonesovaGui
 
     class Album
     {
-        public string Id { get; set; }
-        public string Title { get; set; }
-        public string Thumb { get; set; }
-        public IList<string> Categories { get; set; }
-        public IList<Image> Images { get; set; }
+        public AlbumInfo Info { get; set; }
         public string Content { get; set; }
 
         public override string ToString()
         {
-            return Title;
+            return Info?.Title;
         }
+    }
+
+    class AlbumInfo
+    {
+        public string Id { get; set; }
+        public string Title { get; set; }
+        public string Albumthumb { get; set; }
+        public DateTime Date { get; set; }
+        public IList<string> Categories { get; set; }
+        public IList<Image> Resources { get; set; }
     }
 
     class Image
     {
         public string Src { get; set; }
+        public string Phototitle { get; set; }
         public string Description { get; set; }
         public bool Exif { get; set; }
 
