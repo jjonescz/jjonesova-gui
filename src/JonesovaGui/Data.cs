@@ -328,6 +328,7 @@ namespace JonesovaGui
                 {
                     SelectedImage.Exif = window.imageExifBox.IsChecked ?? false;
                     Changed();
+                    RefreshImage();
                 }
             }
 
@@ -428,11 +429,13 @@ namespace JonesovaGui
                 {
                     window.imageStatus.Visibility = Visibility.Visible;
                     var uri = new Uri(fullPath, UriKind.Absolute);
+                    var exif = SelectedImage.Exif;
                     var bitmap = await Task.Run(() =>
                     {
                         var image = new BitmapImage();
                         image.BeginInit();
                         image.UriSource = uri;
+                        if (exif) image.Rotation = DetectRotation(fullPath);
                         image.EndInit();
                         image.Freeze();
                         return image;
@@ -443,6 +446,33 @@ namespace JonesovaGui
                         window.image.Source = bitmap;
                     });
                 }
+            }
+
+            // From https://stackoverflow.com/a/63627972.
+            private static Rotation DetectRotation(string path)
+            {
+                const string orientationQuery = "System.Photo.Orientation";
+                using (var stream = File.OpenRead(path))
+                {
+                    var bitmapFrame = BitmapFrame.Create(stream, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
+                    var bitmapMetadata = bitmapFrame.Metadata as BitmapMetadata;
+
+                    if (bitmapMetadata != null && bitmapMetadata.ContainsQuery(orientationQuery))
+                    {
+                        var o = bitmapMetadata.GetQuery(orientationQuery);
+                        if (o != null)
+                        {
+                            return (ushort)o switch
+                            {
+                                6 => Rotation.Rotate90,
+                                3 => Rotation.Rotate180,
+                                8 => Rotation.Rotate270,
+                                _ => Rotation.Rotate0,
+                            };
+                        }
+                    }
+                }
+                return Rotation.Rotate0;
             }
 
             private void Changed()
