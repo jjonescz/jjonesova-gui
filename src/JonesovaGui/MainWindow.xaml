@@ -78,7 +78,7 @@
                 </DockPanel>
                 <DockPanel Grid.Row="2">
                     <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Text</Label>
-                    <TextBox x:Name="albumTextBox" VerticalAlignment="Center" Margin="6,0" AcceptsReturn="True"></TextBox>
+                    <TextBox x:Name="albumTextBox" VerticalAlignment="Center" Margin="6,0" AcceptsReturn="True" TextWrapping="Wrap"></TextBox>
                 </DockPanel>
                 <Grid Grid.Row="3">
                     <Grid.ColumnDefinitions>
@@ -118,7 +118,7 @@
                         </CheckBox>
                         <DockPanel Grid.Row="2">
                             <Label Margin="0,0,6,0" FontWeight="Bold">Popisek</Label>
-                            <TextBox x:Name="imageLabelBox" VerticalAlignment="Center" Margin="6,0" AcceptsReturn="True"></TextBox>
+                            <TextBox x:Name="imageLabelBox" VerticalAlignment="Center" Margin="6,0" AcceptsReturn="True" TextWrapping="Wrap"></TextBox>
                         </DockPanel>
                         <DockPanel Grid.Row="3">
                             <Label Margin="0,0,6,0" FontWeight="Bold">Pokročilé</Label>
