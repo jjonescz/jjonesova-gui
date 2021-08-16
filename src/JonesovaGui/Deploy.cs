@@ -80,19 +80,20 @@ namespace JonesovaGui
 
                 Log.Debug("Deploy", $"Got status badge {status}");
 
+                var suffix = Changed(status);
                 switch (status)
                 {
                     case DeployStatus.Success:
                         _ = window.Dispatcher.InvokeAsync(() =>
                         {
-                            window.deployStatus.Content = "Zveřejněno";
+                            window.deployStatus.Content = "Zveřejněno" + suffix;
                             window.deployStatus.Foreground = Brushes.Green;
                         });
                         break;
                     case DeployStatus.Building:
                         _ = window.Dispatcher.InvokeAsync(() =>
                         {
-                            window.deployStatus.Content = "Zveřejňování...";
+                            window.deployStatus.Content = "Zveřejňování..." + suffix;
                             window.deployStatus.Foreground = Brushes.DarkOrange;
                         });
                         break;
@@ -101,7 +102,7 @@ namespace JonesovaGui
                         Log.Warn("Deploy", "Deployment failed/canceled");
                         _ = window.Dispatcher.InvokeAsync(() =>
                         {
-                            window.deployStatus.Content = "Zveřejnění selhalo";
+                            window.deployStatus.Content = "Zveřejnění selhalo" + suffix;
                             window.deployStatus.Foreground = Brushes.DarkRed;
                         });
                         break;
@@ -109,35 +110,35 @@ namespace JonesovaGui
                         Log.Error("Deploy", $"Unrecognized status badge {svg}");
                         _ = window.Dispatcher.InvokeAsync(() =>
                         {
-                            window.deployStatus.Content = "Neznámý stav zveřejnění";
+                            window.deployStatus.Content = "Neznámý stav zveřejnění" + suffix;
                             window.deployStatus.Foreground = Brushes.DarkRed;
                         });
                         break;
                 }
-                Changed(status);
             }
 
-            private void Changed(DeployStatus status)
+            private string Changed(DeployStatus status)
             {
                 try
                 {
-                    if (previousStatus == status)
-                    {
-                        // Continue checking, until status changes for the first time.
-                        Log.Debug("Deploy", $"Same state ({status}), checking continues");
-                        return;
-                    }
-
                     if (status == DeployStatus.Building)
                     {
                         // Continue checking while build is in progress.
                         Log.Debug("Deploy", $"Build in progress (previously {previousStatus}), checking continues");
-                        return;
+                        return string.Empty;
+                    }
+
+                    if (previousStatus == status)
+                    {
+                        // Continue checking, until status changes for the first time.
+                        Log.Debug("Deploy", $"Same state ({status}), checking continues");
+                        return " (aktualizování...)";
                     }
 
                     // Otherwise, stop timer; we got some status change.
                     timer.Stop();
                     Log.Debug("Deploy", $"Got state {status} (previously {previousStatus}), checking stopped");
+                    return string.Empty;
                 }
                 finally
                 {
