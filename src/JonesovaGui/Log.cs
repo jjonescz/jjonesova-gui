@@ -9,14 +9,18 @@ namespace JonesovaGui
     {
         public static readonly string RootPath = Path.GetFullPath("jjonesova.cz");
         private static readonly StreamWriter file = Open();
+        private static readonly object syncRoot = new object();
 
         public static void Write(LogLevel level, string message)
         {
             var line = $"{level} ({DateTime.UtcNow:O}): {message}";
-            file.WriteLine(line);
-            file.Flush();
-            if (Debugger.IsAttached)
-                System.Diagnostics.Debug.WriteLine(line);
+            lock (syncRoot)
+            {
+                file.WriteLine(line);
+                file.Flush();
+                if (Debugger.IsAttached)
+                    System.Diagnostics.Debug.WriteLine(line);
+            }
         }
 
         public static void Write(LogLevel level, string prefix, string message)
