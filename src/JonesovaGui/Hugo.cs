@@ -101,12 +101,19 @@ namespace JonesovaGui
                 }
 
                 // Reload successful.
-                if (data.Contains("Rebuilt in ", StringComparison.Ordinal))
+                var totalIn = false;
+                if (data.Contains("Rebuilt in ", StringComparison.Ordinal) ||
+                    (totalIn = data.Contains("Total in ", StringComparison.Ordinal)))
                 {
                     _ = window.Dispatcher.InvokeAsync(() =>
                     {
-                        window.previewStatus.Content = $"Aktualizováno ({address})";
-                        window.previewStatus.Foreground = Brushes.Green;
+                        // Prefix "Total in" can mean error or success. So if
+                        // error was displayed previously, keep it.
+                        if (!totalIn || window.previewStatus.Foreground != Brushes.DarkRed)
+                        {
+                            window.previewStatus.Content = $"Aktualizováno ({address})";
+                            window.previewStatus.Foreground = Brushes.Green;
+                        }
                     });
                     return;
                 }
