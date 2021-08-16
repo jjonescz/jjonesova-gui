@@ -47,7 +47,10 @@
                 <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
             <DockPanel Grid.Column="0">
-                <Label DockPanel.Dock="Top" FontWeight="Bold">Album</Label>
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                    <Label Margin="0,0,6,0" FontWeight="Bold">Album</Label>
+                    <Button x:Name="addAlbumButton" Padding="12,0" IsEnabled="False">Přidat nové</Button>
+                </StackPanel>
                 <StackPanel x:Name="albumOrder" DockPanel.Dock="Bottom" Margin="0,0,0,6" Orientation="Horizontal" VerticalAlignment="Top" IsEnabled="False">
                     <Label Margin="0,0,6,0" FontWeight="Bold">Posunout</Label>
                     <Button Margin="0,0,6,0" x:Name="albumUpButton" Padding="12,0">⬆</Button>

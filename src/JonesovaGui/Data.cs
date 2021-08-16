@@ -14,11 +14,13 @@ namespace JonesovaGui
     {
         class Data
         {
+            private const string indexFileName = "_index.md";
             private static readonly Regex frontMatterSeparator =
                 new Regex("^---\r?$", RegexOptions.Multiline);
             private readonly IDeserializer deserializer;
             private readonly ISerializer serializer;
             private readonly MainWindow window;
+            private readonly string contentFolder;
             private List<Album> albums;
             private List<string> categories;
 
@@ -34,7 +36,10 @@ namespace JonesovaGui
                     .Build();
 
                 this.window = window;
+                contentFolder = Path.Combine(window.repoPath, "content");
+
                 window.categories.SelectionChanged += Categories_SelectionChanged;
+                window.addAlbumButton.Click += AddAlbumButton_Click;
                 window.albums.SelectionChanged += Albums_SelectionChanged;
                 window.albumUpButton.Click += AlbumUpButton_Click;
                 window.albumDownButton.Click += AlbumDownButton_Click;
@@ -47,11 +52,10 @@ namespace JonesovaGui
 
             public void Load()
             {
-                var contentFolder = Path.Combine(window.repoPath, "content");
                 albums = Directory.EnumerateDirectories(contentFolder)
                     .Select(p =>
                     {
-                        var indexPath = Path.Combine(p, "_index.md");
+                        var indexPath = Path.Combine(p, indexFileName);
                         Log.Debug("Data", $"Deserializing {indexPath}");
                         var indexContent = File.ReadAllText(indexPath);
                         var parts = frontMatterSeparator.Split(indexContent, 3);
@@ -80,8 +84,41 @@ namespace JonesovaGui
             private void Categories_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
             {
                 var category = window.categories.SelectedItem as string;
+                var hasCategory = category != null;
                 RefreshAlbums();
-                window.albums.IsEnabled = category != null;
+                window.albums.IsEnabled = hasCategory;
+                window.addAlbumButton.IsEnabled = hasCategory;
+            }
+
+            private void AddAlbumButton_Click(object sender, RoutedEventArgs e)
+            {
+                // Fund unused title.
+                var number = 1;
+                string Title() => GetName("Album", number);
+                while (albums.Any(a => Title().Equals(a.Info.Title))) number++;
+
+                // Add new album.
+                var title = Title();
+                var id = Slugify(title);
+                var dir = Path.Combine(contentFolder, id);
+                var album = new Album
+                {
+                    Id = id,
+                    DirectoryPath = dir,
+                    IndexPath = Path.Combine(dir, indexFileName),
+                    Info = new AlbumInfo
+                    {
+                        Title = Title(),
+                        Date = DateTime.UtcNow,
+                        Categories = new[] { window.categories.SelectedItem as string }
+                    }
+                };
+                albums.Add(album);
+                Changed();
+
+                // Select it.
+                RefreshAlbums();
+                window.albums.SelectedItem = album;
             }
 
             private void Albums_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
@@ -160,6 +197,7 @@ namespace JonesovaGui
                 foreach (var album in albums)
                 {
                     var yaml = serializer.Serialize(album.Info);
+                    Directory.CreateDirectory(album.DirectoryPath);
                     File.WriteAllLines(album.IndexPath, new[]
                     {
                         "---",
@@ -191,6 +229,17 @@ namespace JonesovaGui
                 window.saveButton.IsEnabled = true;
                 window.saveButton.Content = "Uložit";
                 window.git.RefreshStatus();
+            }
+
+            private static string GetName(string prefix, int number)
+            {
+                if (number == 1) return prefix;
+                return $"{prefix} {number}";
+            }
+
+            private static string Slugify(string name)
+            {
+                return name;
             }
         }
     }
