@@ -43,6 +43,7 @@ namespace JonesovaGui
                 window.albums.SelectionChanged += Albums_SelectionChanged;
                 window.albumUpButton.Click += AlbumUpButton_Click;
                 window.albumDownButton.Click += AlbumDownButton_Click;
+                window.albumDeleteButton.Click += AlbumDeleteButton_Click;
                 window.albumTitleBox.TextChanged += AlbumTitleBox_TextChanged;
                 window.albumTextBox.TextChanged += AlbumTextBox_TextChanged;
                 window.saveButton.Click += SaveButton_Click;
@@ -172,6 +173,13 @@ namespace JonesovaGui
                 RefreshAlbums();
             }
 
+            private void AlbumDeleteButton_Click(object sender, RoutedEventArgs e)
+            {
+                albums.Remove(SelectedAlbum);
+                Changed();
+                RefreshAlbums();
+            }
+
             private void AlbumTitleBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
             {
                 if (SelectedAlbum != null && !string.Equals(SelectedAlbum.Info.Title, window.albumTitleBox.Text))
@@ -194,6 +202,7 @@ namespace JonesovaGui
             {
                 Log.Info("Data", "Saving changes");
 
+                // Add/update albums.
                 foreach (var album in albums)
                 {
                     var yaml = serializer.Serialize(album.Info);
@@ -205,6 +214,15 @@ namespace JonesovaGui
                         "---",
                         album.Text
                     });
+                }
+                
+                // Delete albums.
+                foreach (var p in Directory.EnumerateDirectories(contentFolder))
+                {
+                    if (!albums.Any(a => p.Equals(a.DirectoryPath, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        Directory.Delete(p, recursive: true);
+                    }
                 }
 
                 window.saveButton.IsEnabled = false;

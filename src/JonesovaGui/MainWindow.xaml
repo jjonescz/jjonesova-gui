@@ -54,7 +54,8 @@
                 <StackPanel x:Name="albumOrder" DockPanel.Dock="Bottom" Margin="0,0,0,6" Orientation="Horizontal" VerticalAlignment="Top" IsEnabled="False">
                     <Label Margin="0,0,6,0" FontWeight="Bold">Posunout</Label>
                     <Button Margin="0,0,6,0" x:Name="albumUpButton" Padding="12,0">⬆</Button>
-                    <Button x:Name="albumDownButton" Padding="12,0">⬇</Button>
+                    <Button Margin="0,0,6,0" x:Name="albumDownButton" Padding="12,0">⬇</Button>
+                    <Button x:Name="albumDeleteButton" Padding="12,0">Smazat</Button>
                 </StackPanel>
                 <ListBox x:Name="albums" Margin="6,0,0,6" IsEnabled="False"></ListBox>
             </DockPanel>
