@@ -151,6 +151,7 @@ namespace JonesovaGui
                 return new Signature("Admin GUI", "admin@jjonesova.cz", DateTimeOffset.Now);
             }
 
+            // WARNING: This is called also before publishing, so it must not be `async`!
             private void BackupButton_Click(object sender, RoutedEventArgs e)
             {
                 Log.Info("Git", "Committing changes");
@@ -185,6 +186,10 @@ namespace JonesovaGui
 
             private async void PublishButton_Click(object sender, RoutedEventArgs e)
             {
+                // Backup (i.e., commit) first.
+                if (window.backupButton.IsEnabled)
+                    BackupButton_Click(this, null);
+
                 window.publishButton.IsEnabled = false;
                 window.publishButton.Content = "⌛ Zveřejňování...";
                 pushing = true;
