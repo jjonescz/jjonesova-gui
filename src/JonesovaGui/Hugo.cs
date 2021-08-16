@@ -66,21 +66,62 @@ namespace JonesovaGui
 
             private void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
             {
-                Log.Info("Hugo", $"Stdout: {e.Data}");
+                var data = e.Data ?? string.Empty;
+                Log.Info("Hugo", $"Stdout: {data}");
 
-                var match = Regex.Match(e.Data ?? string.Empty, @"Web Server is available at (\S+)");
-                if (match.Success)
+                // Initial run.
                 {
-                    var oldAddress = address;
-                    address = match.Groups[1].Value;
-                    if (!string.Equals(address, oldAddress))
-                    { 
-                        OpenPreview();
+                    var match = Regex.Match(data, @"Web Server is available at (\S+)");
+                    if (match.Success)
+                    {
+                        var oldAddress = address;
+                        address = match.Groups[1].Value;
+                        if (!string.Equals(address, oldAddress))
+                        {
+                            OpenPreview();
+                            _ = window.Dispatcher.InvokeAsync(() =>
+                            {
+                                window.previewStatus.Content = $"Načteno ({address})";
+                                window.previewStatus.Foreground = Brushes.Black;
+                            });
+                        }
+                        return;
+                    }
+                }
+
+                // Reload in progress.
+                if (data.Contains("Change detected, rebuilding site.", StringComparison.Ordinal))
+                {
+                    _ = window.Dispatcher.InvokeAsync(() =>
+                    {
+                        window.previewStatus.Content = $"Aktualizování...";
+                        window.previewStatus.Foreground = Brushes.DarkOrange;
+                    });
+                    return;
+                }
+
+                // Reload successful.
+                if (data.Contains("Rebuilt in ", StringComparison.Ordinal))
+                {
+                    _ = window.Dispatcher.InvokeAsync(() =>
+                    {
+                        window.previewStatus.Content = $"Aktualizováno ({address})";
+                        window.previewStatus.Foreground = Brushes.Green;
+                    });
+                    return;
+                }
+
+                // Reload failed.
+                {
+                    var match = Regex.Match(data, @"ERROR [\d/]+ [\d:]+ (.*)");
+                    if (match.Success)
+                    {
                         _ = window.Dispatcher.InvokeAsync(() =>
                         {
-                            window.previewStatus.Content = $"Načteno ({address})";
-                            window.previewStatus.Foreground = Brushes.Black;
+                            window.previewStatus.Content = $"Chyba: {match.Groups[1].Value}";
+                            window.previewStatus.Foreground = Brushes.DarkRed;
                         });
+                        return;
                     }
                 }
             }
