@@ -164,7 +164,8 @@ namespace JonesovaGui
 
             private void RestoreButton_Click(object sender, RoutedEventArgs e)
             {
-                var changes = repo.RetrieveStatus().Count();
+                var status = repo.RetrieveStatus();
+                var changes = status.Except(status.Ignored).Count();
                 var result = MessageBox.Show(window,
                     $"Změny v {changes} souborech od předchozí zálohy (nebo předchozího publikování) budou zahozeny.",
                     "Obnovit předchozí zálohu",
@@ -228,7 +229,7 @@ namespace JonesovaGui
                     window.publishButton.IsEnabled = !pushed;
                 }
 
-                Log.Debug("Git", $"Status: {status.Count()} changed files; " +
+                Log.Debug("Git", $"Status: {status}; " +
                     $"dirty: {status.IsDirty}; " +
                     $"ahead by {repo.Head.TrackingDetails.AheadBy}; " +
                     $"behind by {repo.Head.TrackingDetails.BehindBy}");
