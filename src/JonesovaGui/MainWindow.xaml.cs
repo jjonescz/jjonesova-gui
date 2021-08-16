@@ -46,6 +46,10 @@ namespace JonesovaGui
                     Height = coords.Height;
                     Width = coords.Width;
                     if (coords.Maximized) WindowState = WindowState.Maximized;
+                    albumsColumn.Width = new GridLength(coords.AlbumsWidth, GridUnitType.Star);
+                    albumDetailColumn.Width = new GridLength(coords.AlbumDetailWidth, GridUnitType.Star);
+                    imagesColumn.Width = new GridLength(coords.ImagesWidth, GridUnitType.Star);
+                    imageDetailColumn.Width = new GridLength(coords.ImageDetailWidth, GridUnitType.Star);
                 }
                 catch (Exception ex)
                 {
@@ -77,7 +81,13 @@ namespace JonesovaGui
         {
             // Save window coordinates. Inspired by
             // https://stackoverflow.com/a/847761.
-            var coords = new WindowCoordinates();
+            var coords = new WindowCoordinates
+            {
+                AlbumsWidth = albumsColumn.Width.Value,
+                AlbumDetailWidth = albumDetailColumn.Width.Value,
+                ImagesWidth = imagesColumn.Width.Value,
+                ImageDetailWidth = imageDetailColumn.Width.Value,
+            };
             if (WindowState == WindowState.Maximized)
             {
                 coords.Maximized = true;
@@ -138,6 +148,8 @@ namespace JonesovaGui
         public double Top { get; set; }
         public double Left { get; set; }
         public double AlbumsWidth { get; set; }
+        public double AlbumDetailWidth { get; set; }
         public double ImagesWidth { get; set; }
+        public double ImageDetailWidth { get; set; }
     }
 }

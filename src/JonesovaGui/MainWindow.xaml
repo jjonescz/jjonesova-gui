@@ -43,9 +43,9 @@
         </DockPanel>
         <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*" />
+                <ColumnDefinition x:Name="albumsColumn" Width="1*" />
                 <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="2*" />
+                <ColumnDefinition x:Name="albumDetailColumn" Width="2*" />
             </Grid.ColumnDefinitions>
             <DockPanel Grid.Column="0" Margin="0,6,0,0">
                 <StackPanel DockPanel.Dock="Top" Margin="0,0,0,6" Orientation="Horizontal">
@@ -82,9 +82,9 @@
                 </DockPanel>
                 <Grid Grid.Row="3">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition x:Name="imagesColumn" Width="*" />
                         <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition x:Name="imageDetailColumn" Width="*" />
                     </Grid.ColumnDefinitions>
                     <DockPanel Grid.Column="0" Margin="0,6,0,0">
                         <StackPanel DockPanel.Dock="Top" Margin="0,0,0,6" Orientation="Horizontal">
