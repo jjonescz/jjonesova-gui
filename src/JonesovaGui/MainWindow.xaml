@@ -110,7 +110,7 @@
                         </Grid.RowDefinitions>
                         <DockPanel Grid.Row="0">
                             <Label Margin="0,0,6,0" FontWeight="Bold">Obrázek</Label>
-                            <Label x:Name="imageSrc" Foreground="Gray">Žádný</Label>
+                            <TextBox x:Name="imageSrcBox" VerticalAlignment="Center" Margin="6,0" IsEnabled="False"></TextBox>
                         </DockPanel>
                         <DockPanel Grid.Row="1">
                             <Label Margin="0,0,6,0" FontWeight="Bold">Popisek</Label>
@@ -128,7 +128,7 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <Button x:Name="imageSrcButton" Grid.Column="0" Margin="0,0,6,0" Padding="12,2" DockPanel.Dock="Right">Změnit...</Button>
-                            <Button x:Name="imageOpenButton" Grid.Column="1" Margin="0,0,6,0" Padding="12,2" DockPanel.Dock="Right">Otevřít</Button>
+                            <Button x:Name="imageOpenButton" Grid.Column="1" Margin="0,0,6,0" Padding="12,2" DockPanel.Dock="Right" IsEnabled="False">Otevřít</Button>
                         </Grid>
                         <Grid Grid.Row="4">
                             <Label x:Name="imageStatus" Foreground="Gray" Visibility="Collapsed">Načítání...</Label>

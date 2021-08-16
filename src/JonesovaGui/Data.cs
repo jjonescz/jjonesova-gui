@@ -7,9 +7,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Threading;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -63,6 +61,7 @@ namespace JonesovaGui
                 window.albumTitleBox.TextChanged += AlbumTitleBox_TextChanged;
                 window.albumCategoriesBox.TextChanged += AlbumCategoriesBox_TextChanged;
                 window.albumTextBox.TextChanged += AlbumTextBox_TextChanged;
+                window.imageSrcBox.TextChanged += ImageSrcBox_TextChanged;
                 window.imageLabelBox.TextChanged += ImageLabelBox_TextChanged;
                 window.imageExifBox.Click += ImageExifBox_Click;
                 window.imageSrcButton.Click += ImageSrcButton_Click;
@@ -100,7 +99,8 @@ namespace JonesovaGui
                     .ToList();
                 categories = albums.SelectMany(a => a.Info.Categories).Distinct().ToList();
 
-                // Initialize `Image.FullPath` properties.
+                // Normalize some properties for editing (they are then again
+                // modified when saving).
                 foreach (var album in albums)
                 {
                     foreach (var image in album.Info.Resources)
@@ -108,6 +108,7 @@ namespace JonesovaGui
                         if (!string.IsNullOrEmpty(image.Src))
                         {
                             image.FullPath = Path.GetFullPath($"./{image.Src}", basePath: assetsFolder);
+                            image.Src = Path.GetFileName(image.Src);
                         }
                     }
                 }
@@ -159,11 +160,14 @@ namespace JonesovaGui
             {
                 // Find unused title.
                 var number = 1;
-                string Title() => GetName("Album", number);
-                while (albums.Any(a => Title().Equals(a.Info.Title))) number++;
+                string title;
+                while (true)
+                {
+                    title = GetName("Album", number++, " ");
+                    if (!albums.Any(a => title.Equals(a.Info.Title))) break;
+                }
 
                 // Add new album.
-                var title = Title();
                 var id = Slugify(title);
                 var dir = Path.Combine(contentFolder, id);
                 var album = new Album
@@ -173,7 +177,7 @@ namespace JonesovaGui
                     IndexPath = Path.Combine(dir, indexFileName),
                     Info = new AlbumInfo
                     {
-                        Title = Title(),
+                        Title = title,
                         Date = DateTime.UtcNow,
                         Categories = new[] { window.categories.SelectedItem as string }
                     }
@@ -314,6 +318,16 @@ namespace JonesovaGui
                 }
             }
 
+            private void ImageSrcBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+            {
+                var newValue = window.imageSrcBox.Text.Trim();
+                if (SelectedImage != null && !string.Equals(SelectedImage.Src, newValue, StringComparison.Ordinal))
+                {
+                    SelectedImage.Src = newValue;
+                    Changed();
+                }
+            }
+
             private void ImageLabelBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
             {
                 if (SelectedImage != null && !string.Equals(SelectedImage.Description, window.imageLabelBox.Text))
@@ -325,9 +339,10 @@ namespace JonesovaGui
 
             private void ImageExifBox_Click(object sender, RoutedEventArgs e)
             {
-                if (SelectedImage != null && SelectedImage.Exif != (window.imageExifBox.IsChecked ?? false))
+                var newValue = window.imageExifBox.IsChecked ?? false;
+                if (SelectedImage != null && SelectedImage.Exif != newValue)
                 {
-                    SelectedImage.Exif = window.imageExifBox.IsChecked ?? false;
+                    SelectedImage.Exif = newValue;
                     Changed();
                     RefreshImage();
                 }
@@ -372,6 +387,12 @@ namespace JonesovaGui
                     // Add/update albums.
                     foreach (var album in albums)
                     {
+                        // Normalize properties.
+                        foreach (var image in album.Info.Resources)
+                        {
+                            image.Src = $"/{album.Id}/{image.Src}";
+                        }
+
                         var yaml = serializer.Serialize(album.Info);
                         Directory.CreateDirectory(album.DirectoryPath);
                         await File.WriteAllLinesAsync(album.IndexPath, new[]
@@ -393,13 +414,16 @@ namespace JonesovaGui
                         var existingNames = new HashSet<string>();
                         foreach (var image in album.Info.Resources)
                         {
+                            if (string.IsNullOrEmpty(image.Src)) continue;
+
                             // Find unused file name.
                             var number = 1;
                             string name;
                             while (true)
                             {
-                                name = Path.GetFileName(image.FullPath);
-                                name = GetName(Path.GetFileNameWithoutExtension(name), number++, "_") + Path.GetExtension(name);
+                                var bareName = Path.GetFileNameWithoutExtension(image.Src);
+                                var extension = Path.GetExtension(image.Src);
+                                name = GetName(bareName, number++, "_") + extension;
                                 if (existingNames.Add(name)) break;
                             }
 
@@ -466,17 +490,8 @@ namespace JonesovaGui
             private async void RefreshImage()
             {
                 // Show source file name.
-                var src = SelectedImage?.Src;
-                if (string.IsNullOrEmpty(src))
-                {
-                    window.imageSrc.Content = "Žádný";
-                    window.imageSrc.Foreground = Brushes.Gray;
-                }
-                else
-                {
-                    window.imageSrc.Content = Path.GetFileName(src);
-                    window.imageSrc.Foreground = Brushes.Black;
-                }
+                window.imageSrcBox.IsEnabled = SelectedImage != null;
+                window.imageSrcBox.Text = SelectedImage?.Src;
 
                 // Load image in background.
                 window.image.Source = null;
@@ -542,7 +557,7 @@ namespace JonesovaGui
                 }
             }
 
-            private static string GetName(string prefix, int number, string separator = " ")
+            private static string GetName(string prefix, int number, string separator)
             {
                 if (number == 1) return prefix;
                 return $"{prefix}{separator}{number}";
