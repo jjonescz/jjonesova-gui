@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -358,39 +359,48 @@ namespace JonesovaGui
                 Process.Start(new ProcessStartInfo(SelectedImage.FullPath) { UseShellExecute = true });
             }
 
-            private void SaveButton_Click(object sender, RoutedEventArgs e)
+            private async void SaveButton_Click(object sender, RoutedEventArgs e)
             {
                 Log.Info("Data", "Saving changes");
 
-                // Add/update albums.
-                foreach (var album in albums)
-                {
-                    var yaml = serializer.Serialize(album.Info);
-                    Directory.CreateDirectory(album.DirectoryPath);
-                    File.WriteAllLines(album.IndexPath, new[]
-                    {
-                        "---",
-                        yaml,
-                        "---",
-                        album.Text
-                    });
-                }
-
-                // Delete albums.
-                foreach (var p in Directory.EnumerateDirectories(contentFolder))
-                {
-                    if (!albums.Any(a => p.Equals(a.DirectoryPath, StringComparison.OrdinalIgnoreCase)))
-                    {
-                        Directory.Delete(p, recursive: true);
-                    }
-                }
-
                 window.saveButton.IsEnabled = false;
-                window.saveButton.Content = "✔ Uloženo";
-                window.git.RefreshStatus();
+                window.saveButton.Content = "⏳ Ukládání...";
 
-                // Refresh content.
-                Load();
+                await Task.Run(async () =>
+                {
+                    // Add/update albums.
+                    foreach (var album in albums)
+                    {
+                        var yaml = serializer.Serialize(album.Info);
+                        Directory.CreateDirectory(album.DirectoryPath);
+                        await File.WriteAllLinesAsync(album.IndexPath, new[]
+                        {
+                            "---",
+                            yaml,
+                            "---",
+                            album.Text
+                        });
+                    }
+
+                    // Delete albums.
+                    foreach (var p in Directory.EnumerateDirectories(contentFolder))
+                    {
+                        if (!albums.Any(a => p.Equals(a.DirectoryPath, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            Directory.Delete(p, recursive: true);
+                        }
+                    }
+                });
+
+                _ = window.Dispatcher.InvokeAsync(() =>
+                {
+                    window.saveButton.IsEnabled = false;
+                    window.saveButton.Content = "✔ Uloženo";
+                    window.git.RefreshStatus();
+
+                    // Refresh content.
+                    Load();
+                });
             }
 
             private void RefreshAlbums()
