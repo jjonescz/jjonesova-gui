@@ -22,7 +22,8 @@ namespace JonesovaGui
             private readonly IDeserializer deserializer;
             private readonly ISerializer serializer;
             private readonly MainWindow window;
-            private readonly string contentFolder, assetsFolder;
+            private readonly string contentFolder, assetsFolder, lastDirPath;
+            private string lastDir;
             private List<Album> albums;
             private List<string> categories;
 
@@ -40,6 +41,10 @@ namespace JonesovaGui
                 this.window = window;
                 contentFolder = Path.Combine(window.repoPath, "content");
                 assetsFolder = Path.Combine(window.repoPath, "assets");
+                lastDirPath = Path.Combine(Log.RootPath, "last-dir.txt");
+
+                if (File.Exists(lastDirPath))
+                    lastDir = File.ReadAllText(lastDirPath);
 
                 window.categories.SelectionChanged += Categories_SelectionChanged;
                 window.albums.SelectionChanged += Albums_SelectionChanged;
@@ -294,9 +299,16 @@ namespace JonesovaGui
 
             private void ImageSrcButton_Click(object sender, RoutedEventArgs e)
             {
-                var dialog = new OpenFileDialog();
+                var dialog = new OpenFileDialog
+                {
+                    InitialDirectory = lastDir ?? string.Empty
+                };
                 if (dialog.ShowDialog(window) == true)
                 {
+                    // Remember selected directory for next time.
+                    lastDir = Path.GetDirectoryName(dialog.FileName);
+                    File.WriteAllText(lastDirPath, lastDir);
+
                     window.imageSrc.Content = Path.GetFileName(dialog.FileName);
                     window.imageSrc.Foreground = Brushes.Black;
                 }

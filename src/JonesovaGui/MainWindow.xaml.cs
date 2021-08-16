@@ -17,8 +17,8 @@ namespace JonesovaGui
 
         public MainWindow()
         {
-            tokenPath = Path.GetFullPath("jjonesova.cz/token.txt");
-            repoPath = Path.GetFullPath("jjonesova.cz/repo");
+            tokenPath = Path.Combine(Log.RootPath, "token.txt");
+            repoPath = Path.Combine(Log.RootPath, "repo");
 
             InitializeComponent();
 

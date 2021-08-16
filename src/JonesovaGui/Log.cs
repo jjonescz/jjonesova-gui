@@ -7,6 +7,7 @@ namespace JonesovaGui
 {
     static class Log
     {
+        public static readonly string RootPath = Path.GetFullPath("jjonesova.cz");
         private static readonly StreamWriter file = Open();
 
         public static void Write(LogLevel level, string message)
@@ -45,7 +46,7 @@ namespace JonesovaGui
 
         private static StreamWriter Open()
         {
-            var logsPath = Path.GetFullPath("jjonesova.cz/logs");
+            var logsPath = Path.Combine(RootPath, "logs");
             Directory.CreateDirectory(logsPath);
             var logPath = Path.Combine(logsPath, $"{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss-fffffff}.txt");
             return new StreamWriter(logPath);
