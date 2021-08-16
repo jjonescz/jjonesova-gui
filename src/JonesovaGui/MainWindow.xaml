@@ -105,6 +105,7 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <DockPanel Grid.Row="0">
@@ -115,7 +116,13 @@
                             <Label Margin="0,0,6,0" FontWeight="Bold">Popisek</Label>
                             <TextBox x:Name="imageLabelBox" VerticalAlignment="Center" Margin="6,0" AcceptsReturn="True"></TextBox>
                         </DockPanel>
-                        <Grid Grid.Row="2" Margin="6,0,0,0">
+                        <DockPanel Grid.Row="2">
+                            <Label Margin="0,0,6,0" FontWeight="Bold">Pokročilé</Label>
+                            <CheckBox x:Name="imageExifBox" Margin="6,0" VerticalAlignment="Center">
+                                <Label Padding="0">Spravit orientaci</Label>
+                            </CheckBox>
+                        </DockPanel>
+                        <Grid Grid.Row="3" Margin="6,0,0,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
@@ -123,7 +130,7 @@
                             <Button x:Name="imageSrcButton" Grid.Column="0" Margin="0,0,6,0" Padding="12,2" DockPanel.Dock="Right">Změnit...</Button>
                             <Button x:Name="imageOpenButton" Grid.Column="1" Margin="0,0,6,0" Padding="12,2" DockPanel.Dock="Right">Otevřít</Button>
                         </Grid>
-                        <Grid Grid.Row="3">
+                        <Grid Grid.Row="4">
                             <Label x:Name="imageStatus" Foreground="Gray" Visibility="Collapsed">Načítání...</Label>
                             <Image x:Name="image" Margin="6"></Image>
                         </Grid>

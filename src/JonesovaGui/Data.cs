@@ -63,6 +63,7 @@ namespace JonesovaGui
                 window.albumCategoriesBox.TextChanged += AlbumCategoriesBox_TextChanged;
                 window.albumTextBox.TextChanged += AlbumTextBox_TextChanged;
                 window.imageLabelBox.TextChanged += ImageLabelBox_TextChanged;
+                window.imageExifBox.Click += ImageExifBox_Click;
                 window.imageSrcButton.Click += ImageSrcButton_Click;
                 window.imageOpenButton.Click += ImageOpenButton_Click;
                 window.saveButton.Click += SaveButton_Click;
@@ -149,6 +150,7 @@ namespace JonesovaGui
                 window.imageOrder.IsEnabled = hasImage;
                 window.imageDetails.IsEnabled = hasImage;
                 window.imageLabelBox.Text = SelectedImage?.Description;
+                window.imageExifBox.IsChecked = SelectedImage?.Exif ?? false;
                 RefreshImage();
             }
 
@@ -316,6 +318,15 @@ namespace JonesovaGui
                 if (SelectedImage != null && !string.Equals(SelectedImage.Description, window.imageLabelBox.Text))
                 {
                     SelectedImage.Description = window.imageLabelBox.Text;
+                    Changed();
+                }
+            }
+
+            private void ImageExifBox_Click(object sender, RoutedEventArgs e)
+            {
+                if (SelectedImage != null && SelectedImage.Exif != (window.imageExifBox.IsChecked ?? false))
+                {
+                    SelectedImage.Exif = window.imageExifBox.IsChecked ?? false;
                     Changed();
                 }
             }
