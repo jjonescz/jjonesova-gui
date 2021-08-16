@@ -47,7 +47,7 @@
                 <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
             <DockPanel Grid.Column="0">
-                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                <StackPanel Margin="0,0,0,6" DockPanel.Dock="Top" Orientation="Horizontal">
                     <Label Margin="0,0,6,0" FontWeight="Bold">Album</Label>
                     <Button x:Name="addAlbumButton" Padding="12,0" IsEnabled="False">Přidat nové</Button>
                 </StackPanel>
@@ -57,7 +57,7 @@
                     <Button Margin="0,0,6,0" x:Name="albumDownButton" Padding="12,0">⬇</Button>
                     <Button x:Name="albumDeleteButton" Padding="12,0">Smazat</Button>
                 </StackPanel>
-                <ListBox x:Name="albums" Margin="6,0,0,6" IsEnabled="False"></ListBox>
+                <ListBox x:Name="albums" Margin="6,0,6,6" IsEnabled="False"></ListBox>
             </DockPanel>
             <Grid x:Name="albumDetails" Grid.Column="1" IsEnabled="False">
                 <Grid.RowDefinitions>
