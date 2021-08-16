@@ -37,7 +37,7 @@
             <Button x:Name="webButton" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="12,0" Margin="6,0"
                     ToolTip="https://jjonesova.cz" Click="webButton_Click">Zobrazit web</Button>
         </DockPanel>
-        <DockPanel Grid.Row="3">
+        <DockPanel Grid.Row="3" Margin="0,6,0,0">
             <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Kategorie</Label>
             <ComboBox x:Name="categories" Margin="0,0,6,0" VerticalAlignment="Center" IsEnabled="False"></ComboBox>
         </DockPanel>
