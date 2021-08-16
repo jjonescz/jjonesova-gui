@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -133,11 +134,13 @@ namespace JonesovaGui
                 window.addImageButton.IsEnabled = hasAlbum;
             }
 
-            private void Images_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+            private async void Images_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
             {
                 var hasImage = SelectedImage != null;
                 window.imageOrder.IsEnabled = hasImage;
                 window.imageDetails.IsEnabled = hasImage;
+
+                // Show source file name.
                 var src = SelectedImage?.Src;
                 if (string.IsNullOrEmpty(src))
                 {
@@ -149,8 +152,29 @@ namespace JonesovaGui
                     window.imageSrc.Content = Path.GetFileName(src);
                     window.imageSrc.Foreground = Brushes.Black;
                 }
-                window.image.Source = SelectedImage?.FullPath == null ? null :
-                    new BitmapImage(new Uri(SelectedImage.FullPath, UriKind.Absolute));
+
+                // Load image in background.
+                window.image.Source = null;
+                var fullPath = SelectedImage?.FullPath;
+                if (fullPath != null)
+                {
+                    window.imageStatus.Visibility = Visibility.Visible;
+                    var uri = new Uri(fullPath, UriKind.Absolute);
+                    var bitmap = await Task.Run(() =>
+                    {
+                        var image = new BitmapImage();
+                        image.BeginInit();
+                        image.UriSource = uri;
+                        image.EndInit();
+                        image.Freeze();
+                        return image;
+                    });
+                    _ = window.Dispatcher.InvokeAsync(() =>
+                    {
+                        window.imageStatus.Visibility = Visibility.Collapsed;
+                        window.image.Source = bitmap;
+                    });
+                }
             }
 
             private void AddAlbumButton_Click(object sender, RoutedEventArgs e)
