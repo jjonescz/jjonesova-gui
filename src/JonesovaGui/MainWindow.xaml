@@ -44,10 +44,11 @@
         <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
             <DockPanel Grid.Column="0">
-                <StackPanel Margin="0,0,0,6" DockPanel.Dock="Top" Orientation="Horizontal">
+                <StackPanel Margin="0,6,0,6" DockPanel.Dock="Top" Orientation="Horizontal">
                     <Label Margin="0,0,6,0" FontWeight="Bold">Album</Label>
                     <Button x:Name="addAlbumButton" Padding="12,0" IsEnabled="False">Přidat nové</Button>
                 </StackPanel>
@@ -59,11 +60,13 @@
                 </StackPanel>
                 <ListBox x:Name="albums" Margin="6,0,6,6" IsEnabled="False"></ListBox>
             </DockPanel>
-            <Grid x:Name="albumDetails" Grid.Column="1" IsEnabled="False">
+            <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="4" ShowsPreview="True" />
+            <Grid x:Name="albumDetails" Grid.Column="2" IsEnabled="False">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <DockPanel Grid.Row="0">
                     <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Titulek</Label>
@@ -77,6 +80,27 @@
                     <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Text</Label>
                     <TextBox x:Name="albumTextBox" VerticalAlignment="Center" Margin="6,0" AcceptsReturn="True"></TextBox>
                 </DockPanel>
+                <Grid Grid.Row="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <DockPanel Grid.Column="0">
+                        <StackPanel Margin="0,6,0,6" DockPanel.Dock="Top" Orientation="Horizontal">
+                            <Label Margin="0,0,6,0" FontWeight="Bold">Obrázky</Label>
+                            <Button x:Name="addImageButton" Padding="12,0" IsEnabled="False">Přidat nový</Button>
+                        </StackPanel>
+                        <StackPanel x:Name="imageOrder" DockPanel.Dock="Bottom" Margin="0,0,0,6" Orientation="Horizontal" VerticalAlignment="Top" IsEnabled="False">
+                            <Label Margin="0,0,6,0" FontWeight="Bold">Posunout</Label>
+                            <Button Margin="0,0,6,0" x:Name="imageUpButton" Padding="12,0">⬆</Button>
+                            <Button Margin="0,0,6,0" x:Name="imageDownButton" Padding="12,0">⬇</Button>
+                            <Button x:Name="imageDeleteButton" Padding="12,0">Smazat</Button>
+                        </StackPanel>
+                        <ListBox x:Name="images" Margin="6,0,6,6" IsEnabled="False"></ListBox>
+                    </DockPanel>
+                    <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="4" ShowsPreview="True" />
+                </Grid>
             </Grid>
         </Grid>
     </Grid>
