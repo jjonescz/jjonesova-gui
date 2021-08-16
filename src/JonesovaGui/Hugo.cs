@@ -19,7 +19,7 @@ namespace JonesovaGui
             {
                 this.window = window;
                 var hugoPath = Path.GetFullPath("Assets/hugo.exe");
-                hugoStart = new ProcessStartInfo(hugoPath, "server")
+                hugoStart = new ProcessStartInfo(hugoPath, "--gc server")
                 {
                     WorkingDirectory = window.repoPath,
                     RedirectStandardOutput = true,
