@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:JonesovaGui"
         mc:Ignorable="d"
-        Title="jjonesova.cz" Height="450" Width="800"
+        Title="jjonesova.cz" Height="500" Width="800"
         Loaded="Window_Loaded" Closing="Window_Closing" SourceInitialized="Window_SourceInitialized">
     <Grid>
         <Grid.RowDefinitions>
@@ -103,14 +103,22 @@
                     <Grid x:Name="imageDetails" Grid.Column="2" Margin="0,6,0,0" IsEnabled="False">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <DockPanel Grid.Row="0">
                             <Label Margin="0,0,6,0" FontWeight="Bold">Obrázek</Label>
-                            <Button x:Name="imageSrcButton" Margin="0,0,6,0" Padding="12,0" DockPanel.Dock="Right">Změnit</Button>
-                            <Label x:Name="imageSrc" Margin="0,0,12,0" Foreground="Gray">Žádný</Label>
+                            <Label x:Name="imageSrc" Foreground="Gray">Žádný</Label>
                         </DockPanel>
-                        <Grid Grid.Row="1">
+                        <Grid Grid.Row="1" Margin="6,0,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="imageSrcButton" Grid.Column="0" Margin="0,0,6,0" Padding="12,2" DockPanel.Dock="Right">Změnit...</Button>
+                            <Button x:Name="imageOpenButton" Grid.Column="1" Margin="0,0,6,0" Padding="12,2" DockPanel.Dock="Right">Otevřít</Button>
+                        </Grid>
+                        <Grid Grid.Row="2">
                             <Label x:Name="imageStatus" Foreground="Gray" Visibility="Collapsed">Načítání...</Label>
                             <Image x:Name="image" Margin="6"></Image>
                         </Grid>

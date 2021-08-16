@@ -63,6 +63,7 @@ namespace JonesovaGui
                 window.albumCategoriesBox.TextChanged += AlbumCategoriesBox_TextChanged;
                 window.albumTextBox.TextChanged += AlbumTextBox_TextChanged;
                 window.imageSrcButton.Click += ImageSrcButton_Click;
+                window.imageOpenButton.Click += ImageOpenButton_Click;
                 window.saveButton.Click += SaveButton_Click;
             }
 
@@ -326,6 +327,12 @@ namespace JonesovaGui
                     Changed();
                     RefreshImage();
                 }
+            }
+
+            private void ImageOpenButton_Click(object sender, RoutedEventArgs e)
+            {
+                Log.Debug("Data", $"Opening image {SelectedImage.FullPath}");
+                Process.Start(new ProcessStartInfo(SelectedImage.FullPath) { UseShellExecute = true });
             }
 
             private void SaveButton_Click(object sender, RoutedEventArgs e)
