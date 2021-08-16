@@ -28,6 +28,11 @@ namespace JonesovaGui
             Write(LogLevel.Error, prefix, message);
         }
 
+        public static void Warn(string prefix, string message)
+        {
+            Write(LogLevel.Warning, prefix, message);
+        }
+
         public static void Info(string prefix, string message)
         {
             Write(LogLevel.Info, prefix, message);

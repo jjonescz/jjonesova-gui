@@ -12,6 +12,7 @@ namespace JonesovaGui
         private readonly string tokenPath, repoPath;
         private readonly Git git;
         private readonly Data data;
+        private readonly Deploy deploy;
 
         public MainWindow()
         {
@@ -22,6 +23,7 @@ namespace JonesovaGui
 
             git = new Git(this);
             data = new Data(this);
+            deploy = new Deploy(this);
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
@@ -38,6 +40,9 @@ namespace JonesovaGui
 
             // Load content.
             data.Load();
+
+            // Detect deployment status.
+            deploy.Detect();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

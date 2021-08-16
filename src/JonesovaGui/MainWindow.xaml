@@ -30,6 +30,7 @@
             <Button x:Name="saveButton" Padding="12,0" Margin="6,0" IsEnabled="False">Uložit</Button>
             <Button x:Name="backupButton" Padding="12,0" Margin="6,0" IsEnabled="False" ToolTip="git commit">Zálohovat</Button>
             <Button x:Name="restoreButton" Padding="12,0" Margin="6,0" IsEnabled="False" ToolTip="git reset --hard">Obnovit předchozí zálohu...</Button>
+            <Label x:Name="deployStatus" Foreground="Gray">Čeká...</Label>
         </StackPanel>
         <DockPanel Grid.Row="3">
             <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Kategorie</Label>
