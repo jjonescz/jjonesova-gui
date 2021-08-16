@@ -107,7 +107,7 @@ namespace JonesovaGui
                     {
                         if (!string.IsNullOrEmpty(image.Src))
                         {
-                            image.FullPath = Path.Combine(assetsFolder, $"./{image.Src}");
+                            image.FullPath = Path.GetFullPath($"./{image.Src}", basePath: assetsFolder);
                         }
                     }
                 }
@@ -347,7 +347,8 @@ namespace JonesovaGui
 
                     // Update file path.
                     SelectedImage.FullPath = dialog.FileName;
-                    SelectedImage.Src = Path.GetFileName(dialog.FileName);
+                    var name = Path.GetFileName(dialog.FileName);
+                    SelectedImage.Src = $"/{SelectedAlbum.Id}/{name.ToLower()}";
                     Changed();
                     RefreshImage();
                 }
@@ -382,12 +383,57 @@ namespace JonesovaGui
                         });
                     }
 
+                    // Copy images. Note that this must happen before deleting
+                    // old albums, as we might need to copy images of albums
+                    // that will be deleted in the next step (this happens when
+                    // renaming an album).
+                    var anyCopied = false;
+                    foreach (var album in albums)
+                    {
+                        var existingNames = new HashSet<string>();
+                        foreach (var image in album.Info.Resources)
+                        {
+                            // Find unused file name.
+                            var number = 1;
+                            string name;
+                            while (true)
+                            {
+                                name = Path.GetFileName(image.FullPath);
+                                name = GetName(Path.GetFileNameWithoutExtension(name), number++, "_") + Path.GetExtension(name);
+                                if (existingNames.Add(name)) break;
+                            }
+
+                            // Copy image if not the same as previously.
+                            var fullPath = Path.Combine(assetsFolder, album.Id, name);
+                            if (!fullPath.Equals(image.FullPath))
+                            {
+                                // Report status (if the first time copying).
+                                if (!anyCopied)
+                                {
+                                    anyCopied = true;
+                                    _ = window.Dispatcher.InvokeAsync(() =>
+                                    {
+                                        window.saveButton.Content = "⌛ Kopírování obrázků...";
+                                    });
+                                }
+
+                                Log.Debug("Data", $"Copying image from {image.FullPath} to {fullPath}");
+                                File.Copy(image.FullPath, fullPath, overwrite: true);
+                            }
+                        }
+                    }
+
                     // Delete albums.
                     foreach (var p in Directory.EnumerateDirectories(contentFolder))
                     {
                         if (!albums.Any(a => p.Equals(a.DirectoryPath, StringComparison.OrdinalIgnoreCase)))
                         {
+                            var albumId = Path.GetFileName(p);
+                            var albumAssetsPath = Path.Combine(assetsFolder, p);
+                            Log.Debug("Data", $"Deleting album {albumId} at {p}");
                             Directory.Delete(p, recursive: true);
+                            Log.Debug("Data", $"Deleting album assets at {albumAssetsPath}");
+                            Directory.Delete(albumAssetsPath, recursive: true);
                         }
                     }
                 });
@@ -435,6 +481,7 @@ namespace JonesovaGui
                 // Load image in background.
                 window.image.Source = null;
                 var fullPath = SelectedImage?.FullPath;
+                window.imageOpenButton.IsEnabled = fullPath != null;
                 if (fullPath != null)
                 {
                     window.imageStatus.Visibility = Visibility.Visible;
@@ -495,10 +542,10 @@ namespace JonesovaGui
                 }
             }
 
-            private static string GetName(string prefix, int number)
+            private static string GetName(string prefix, int number, string separator = " ")
             {
                 if (number == 1) return prefix;
-                return $"{prefix} {number}";
+                return $"{prefix}{separator}{number}";
             }
 
             private static string Slugify(string name)
