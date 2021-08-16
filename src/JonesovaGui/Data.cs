@@ -19,6 +19,7 @@ namespace JonesovaGui
             private readonly MainWindow window;
             private List<Album> albums;
             private List<string> categories;
+            private bool dirty;
 
             public Data(MainWindow window)
             {
@@ -27,6 +28,7 @@ namespace JonesovaGui
                 window.albums.SelectionChanged += Albums_SelectionChanged;
                 window.albumUpButton.Click += AlbumUpButton_Click;
                 window.albumDownButton.Click += AlbumDownButton_Click;
+                window.saveButton.Click += SaveButton_Click;
             }
 
             public void Load()
@@ -109,6 +111,7 @@ namespace JonesovaGui
                 }
                 Log.Debug("Data", $"Moving album #{window.albums.SelectedIndex} up, setting its date to {newDate}");
                 (window.albums.SelectedItem as Album).Info.Date = newDate;
+                Changed();
                 RefreshAlbums();
             }
 
@@ -129,7 +132,16 @@ namespace JonesovaGui
                 }
                 Log.Debug("Data", $"Moving album #{window.albums.SelectedIndex} down, setting its date to {newDate}");
                 (window.albums.SelectedItem as Album).Info.Date = newDate;
+                Changed();
                 RefreshAlbums();
+            }
+
+            private void SaveButton_Click(object sender, RoutedEventArgs e)
+            {
+                Log.Info("Data", "Saving changes");
+
+                dirty = false;
+                window.saveButton.IsEnabled = false;
             }
 
             private void RefreshAlbums()
@@ -147,6 +159,12 @@ namespace JonesovaGui
                 window.albumsStatus.Foreground = Brushes.Black;
                 window.albumsStatus.Visibility = Visibility.Visible;
                 window.albums.Visibility = Visibility.Collapsed;
+            }
+
+            private void Changed()
+            {
+                dirty = true;
+                window.saveButton.IsEnabled = true;
             }
         }
     }

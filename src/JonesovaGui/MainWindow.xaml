@@ -12,6 +12,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0">
@@ -25,11 +26,15 @@
             <Button x:Name="previewButton" DockPanel.Dock="Right" HorizontalAlignment="Right" Padding="12,0" Margin="6,0">Zobrazit</Button>
         </DockPanel>
         <DockPanel Grid.Row="2">
+            <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Změny</Label>
+            <Button x:Name="saveButton" DockPanel.Dock="Right" HorizontalAlignment="Left" Padding="12,0" Margin="6,0" IsEnabled="False">Uložit</Button>
+        </DockPanel>
+        <DockPanel Grid.Row="3">
             <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Kategorie</Label>
             <Label x:Name="categoriesStatus" DockPanel.Dock="Left" Foreground="Gray">Čeká...</Label>
             <ComboBox x:Name="categories" Margin="0,0,6,0" VerticalAlignment="Center" Visibility="Collapsed"></ComboBox>
         </DockPanel>
-        <Grid Grid.Row="3">
+        <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="2*" />
