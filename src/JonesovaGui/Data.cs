@@ -373,8 +373,7 @@ namespace JonesovaGui
 
                     // Update file path.
                     SelectedImage.FullPath = dialog.FileName;
-                    var name = Path.GetFileName(dialog.FileName);
-                    SelectedImage.Src = $"/{SelectedAlbum.Id}/{name.ToLower()}";
+                    SelectedImage.Src = Path.GetFileName(dialog.FileName).ToLowerInvariant();
                     Changed();
                     RefreshImage();
                 }
