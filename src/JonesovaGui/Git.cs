@@ -29,7 +29,7 @@ namespace JonesovaGui
                 window.publishButton.Click += PublishButton_Click;
             }
 
-            public async Task UpdateAsync()
+            public async Task<bool> UpdateAsync()
             {
                 Directory.CreateDirectory(window.repoPath);
                 try
@@ -55,7 +55,7 @@ namespace JonesovaGui
                         // Pull repository.
                         Log.Info("Git", $"Repo at {window.repoPath} valid; will pull");
                         repo = new Repository(window.repoPath);
-                        if (!await PullAsync()) return;
+                        if (!await PullAsync()) return false;
                     }
                 }
                 catch (LibGit2SharpException e)
@@ -64,12 +64,13 @@ namespace JonesovaGui
                     window.loginStatus.Content = "Chyba; zadejte kód:";
                     window.loginStatus.Foreground = Brushes.DarkRed;
                     window.tokenBox.Visibility = Visibility.Visible;
-                    return;
+                    return false;
                 }
 
                 window.loginStatus.Content = "Přihlášení úspěšné";
                 window.loginStatus.Foreground = Brushes.Black;
                 window.tokenBox.Visibility = Visibility.Collapsed;
+                return true;
             }
 
             private async Task<bool> PullAsync()
