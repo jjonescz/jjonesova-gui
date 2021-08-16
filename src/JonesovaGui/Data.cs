@@ -111,6 +111,8 @@ namespace JonesovaGui
                 // modified when saving).
                 foreach (var album in albums)
                 {
+                    album.Info.Categories ??= new List<string>();
+                    album.Info.Resources ??= new List<Image>();
                     foreach (var image in album.Info.Resources)
                     {
                         if (!string.IsNullOrEmpty(image.Src))
@@ -187,7 +189,8 @@ namespace JonesovaGui
                     {
                         Title = title,
                         Date = DateTime.UtcNow,
-                        Categories = new[] { window.categories.SelectedItem as string }
+                        Categories = new List<string>(1) { window.categories.SelectedItem as string },
+                        Resources = new List<Image>()
                     }
                 };
                 albums.Add(album);
