@@ -401,7 +401,8 @@ namespace JonesovaGui
                         album.IndexPath = Path.Combine(album.DirectoryPath, indexFileName);
                         foreach (var image in album.Info.Resources)
                         {
-                            image.Src = $"/{album.Id}/{image.Src}";
+                            image.Src = string.IsNullOrWhiteSpace(image.Src) ? null :
+                                $"/{album.Id}/{image.Src}";
                         }
 
                         // Save Markdown.
@@ -426,7 +427,11 @@ namespace JonesovaGui
                         var existingNames = new HashSet<string>();
                         foreach (var image in album.Info.Resources)
                         {
-                            if (string.IsNullOrEmpty(image.Src)) continue;
+                            if (string.IsNullOrEmpty(image.Src))
+                            {
+                                image.FullPath = null;
+                                continue;
+                            }
 
                             // Find unused file name.
                             var number = 1;
