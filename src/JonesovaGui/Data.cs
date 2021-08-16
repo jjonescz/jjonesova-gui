@@ -660,7 +660,7 @@ namespace JonesovaGui
 
         public override string ToString()
         {
-            return Info?.Title + (Changed ? " *" : null);
+            return (Changed ? "* " : null) + Info?.Title;
         }
     }
 
@@ -686,7 +686,7 @@ namespace JonesovaGui
 
         public override string ToString()
         {
-            return (Src == null ? Description : Path.GetFileName(Src)) + (Changed ? " *" : null);
+            return (Changed ? "* " : null) + $"{Src}: {Description}";
         }
     }
 
