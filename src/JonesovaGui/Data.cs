@@ -41,10 +41,13 @@ namespace JonesovaGui
 
                 window.categories.SelectionChanged += Categories_SelectionChanged;
                 window.albums.SelectionChanged += Albums_SelectionChanged;
+                window.images.SelectionChanged += Images_SelectionChanged;
                 window.addAlbumButton.Click += AddAlbumButton_Click;
                 window.addImageButton.Click += AddImageButton_Click;
                 window.albumUpButton.Click += AlbumUpButton_Click;
                 window.albumDownButton.Click += AlbumDownButton_Click;
+                window.imageUpButton.Click += ImageUpButton_Click;
+                window.imageDownButton.Click += ImageDownButton_Click;
                 window.albumDeleteButton.Click += AlbumDeleteButton_Click;
                 window.albumTitleBox.TextChanged += AlbumTitleBox_TextChanged;
                 window.albumCategoriesBox.TextChanged += AlbumCategoriesBox_TextChanged;
@@ -106,6 +109,12 @@ namespace JonesovaGui
                 RefreshImages();
                 window.images.IsEnabled = hasAlbum;
                 window.addImageButton.IsEnabled = hasAlbum;
+            }
+
+            private void Images_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+            {
+                var hasImage = SelectedImage != null;
+                window.imageOrder.IsEnabled = hasImage;
             }
 
             private void AddAlbumButton_Click(object sender, RoutedEventArgs e)
@@ -194,6 +203,31 @@ namespace JonesovaGui
                 SelectedAlbum.Info.Date = newDate;
                 Changed();
                 RefreshAlbums();
+            }
+
+
+            private void ImageUpButton_Click(object sender, RoutedEventArgs e)
+            {
+                var index = window.images.SelectedIndex;
+                if (index <= 0) return;
+                var image = SelectedImage;
+                SelectedAlbum.Info.Resources.RemoveAt(index);
+                SelectedAlbum.Info.Resources.Insert(index - 1, image);
+                Changed();
+                RefreshImages();
+                window.images.SelectedIndex = index - 1;
+            }
+
+            private void ImageDownButton_Click(object sender, RoutedEventArgs e)
+            {
+                var index = window.images.SelectedIndex;
+                if (index >= window.images.Items.Count - 1) return;
+                var image = SelectedImage;
+                SelectedAlbum.Info.Resources.RemoveAt(index);
+                SelectedAlbum.Info.Resources.Insert(index + 1, image);
+                Changed();
+                RefreshImages();
+                window.images.SelectedIndex = index + 1;
             }
 
             private void AlbumDeleteButton_Click(object sender, RoutedEventArgs e)
