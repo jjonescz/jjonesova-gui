@@ -22,7 +22,6 @@ namespace JonesovaGui
             private readonly MainWindow window;
             private List<Album> albums;
             private List<string> categories;
-            private bool dirty;
 
             public Data(MainWindow window)
             {
@@ -161,7 +160,6 @@ namespace JonesovaGui
                     });
                 }
 
-                dirty = false;
                 window.saveButton.IsEnabled = false;
             }
 
@@ -184,7 +182,6 @@ namespace JonesovaGui
 
             private void Changed()
             {
-                dirty = true;
                 window.saveButton.IsEnabled = true;
             }
         }
