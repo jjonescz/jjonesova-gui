@@ -39,6 +39,7 @@ namespace JonesovaGui
                 window.albums.SelectionChanged += Albums_SelectionChanged;
                 window.albumUpButton.Click += AlbumUpButton_Click;
                 window.albumDownButton.Click += AlbumDownButton_Click;
+                window.albumTitleBox.TextChanged += AlbumTitleBox_TextChanged;
                 window.saveButton.Click += SaveButton_Click;
             }
 
@@ -94,6 +95,7 @@ namespace JonesovaGui
                 var hasAlbum = album != null;
                 window.albumOrder.IsEnabled = hasAlbum;
                 window.albumDetails.IsEnabled = hasAlbum;
+                window.albumTitleBox.Text = album?.Info.Title;
             }
 
             private void AlbumUpButton_Click(object sender, RoutedEventArgs e)
@@ -136,6 +138,12 @@ namespace JonesovaGui
                 (window.albums.SelectedItem as Album).Info.Date = newDate;
                 Changed();
                 RefreshAlbums();
+            }
+
+            private void AlbumTitleBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+            {
+                (window.albums.SelectedItem as Album).Info.Title = window.albumTitleBox.Text;
+                Changed();
             }
 
             private void SaveButton_Click(object sender, RoutedEventArgs e)
