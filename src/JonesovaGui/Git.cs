@@ -256,26 +256,21 @@ namespace JonesovaGui
                     foreach (var image in album.Info.Resources)
                         image.Changed = false;
                 }
-                var anyChanged = false;
                 foreach (var entry in status)
                 {
                     var fullPath = Path.GetFullPath(entry.FilePath, basePath: window.repoPath);
                     foreach (var album in window.data.Albums)
                     {
-                        anyChanged |= album.Changed |= fullPath.Equals(album.IndexPath, StringComparison.OrdinalIgnoreCase);
+                        album.Changed |= fullPath.Equals(album.IndexPath, StringComparison.OrdinalIgnoreCase);
 
                         foreach (var image in album.Info.Resources)
                         {
-                            anyChanged |= image.Changed |= fullPath.Equals(image.FullPath, StringComparison.OrdinalIgnoreCase);
+                            image.Changed |= fullPath.Equals(image.FullPath, StringComparison.OrdinalIgnoreCase);
                         }
                     }
                 }
-                if (anyChanged)
-                {
-                    Log.Debug("Git", "Refreshing list UI");
-                    window.albums.Items.Refresh();
-                    window.images.Items.Refresh();
-                }
+                window.albums.Items.Refresh();
+                window.images.Items.Refresh();
             }
         }
     }
