@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -54,6 +55,7 @@ namespace JonesovaGui
                 window.albumTitleBox.TextChanged += AlbumTitleBox_TextChanged;
                 window.albumCategoriesBox.TextChanged += AlbumCategoriesBox_TextChanged;
                 window.albumTextBox.TextChanged += AlbumTextBox_TextChanged;
+                window.imageSrcButton.Click += ImageSrcButton_Click;
                 window.saveButton.Click += SaveButton_Click;
             }
 
@@ -117,6 +119,7 @@ namespace JonesovaGui
             {
                 var hasImage = SelectedImage != null;
                 window.imageOrder.IsEnabled = hasImage;
+                window.imageDetails.IsEnabled = hasImage;
                 var src = SelectedImage?.Src;
                 if (string.IsNullOrEmpty(src))
                 {
@@ -286,6 +289,16 @@ namespace JonesovaGui
                 {
                     SelectedAlbum.Text = window.albumTextBox.Text;
                     Changed();
+                }
+            }
+
+            private void ImageSrcButton_Click(object sender, RoutedEventArgs e)
+            {
+                var dialog = new OpenFileDialog();
+                if (dialog.ShowDialog(window) == true)
+                {
+                    window.imageSrc.Content = Path.GetFileName(dialog.FileName);
+                    window.imageSrc.Foreground = Brushes.Black;
                 }
             }
 
