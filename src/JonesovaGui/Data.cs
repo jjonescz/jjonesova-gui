@@ -443,6 +443,11 @@ namespace JonesovaGui
 
                                 Log.Debug("Data", $"Copying image from {image.FullPath} to {fullPath}");
                                 File.Copy(image.FullPath, fullPath, overwrite: true);
+
+                                // Update full path (needed below when deleting
+                                // unused images; would not be needed otherwise
+                                // since we will reload all data anyway).
+                                image.FullPath = fullPath;
                             }
                         }
                     }
@@ -458,6 +463,19 @@ namespace JonesovaGui
                             Directory.Delete(p, recursive: true);
                             Log.Debug("Data", $"Deleting album assets at {albumAssetsPath}");
                             Directory.Delete(albumAssetsPath, recursive: true);
+                        }
+                    }
+
+                    // Delete unused images.
+                    foreach (var dir in Directory.EnumerateDirectories(assetsFolder))
+                    {
+                        foreach (var p in Directory.EnumerateFiles(dir))
+                        {
+                            if (!albums.SelectMany(a => a.Info.Resources).Any(i => p.Equals(i.FullPath, StringComparison.OrdinalIgnoreCase)))
+                            {
+                                Log.Debug("Data", $"Deleting image {p}");
+                                File.Delete(p);
+                            }
                         }
                     }
                 });
