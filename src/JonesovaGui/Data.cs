@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Media;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -116,6 +117,17 @@ namespace JonesovaGui
             {
                 var hasImage = SelectedImage != null;
                 window.imageOrder.IsEnabled = hasImage;
+                var src = SelectedImage?.Src;
+                if (string.IsNullOrEmpty(src))
+                {
+                    window.imageSrc.Content = "Žádný";
+                    window.imageSrc.Foreground = Brushes.Gray;
+                }
+                else
+                {
+                    window.imageSrc.Content = Path.GetFileName(src);
+                    window.imageSrc.Foreground = Brushes.Black;
+                }
             }
 
             private void AddAlbumButton_Click(object sender, RoutedEventArgs e)

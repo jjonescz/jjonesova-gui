@@ -47,8 +47,8 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
-            <DockPanel Grid.Column="0">
-                <StackPanel Margin="0,6,0,6" DockPanel.Dock="Top" Orientation="Horizontal">
+            <DockPanel Grid.Column="0" Margin="0,6,0,0">
+                <StackPanel DockPanel.Dock="Top" Margin="0,0,0,6" Orientation="Horizontal">
                     <Label Margin="0,0,6,0" FontWeight="Bold">Album</Label>
                     <Button x:Name="addAlbumButton" Padding="12,0" IsEnabled="False">Přidat nové</Button>
                 </StackPanel>
@@ -61,7 +61,7 @@
                 <ListBox x:Name="albums" Margin="6,0,6,6" IsEnabled="False"></ListBox>
             </DockPanel>
             <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="4" ShowsPreview="True" />
-            <Grid x:Name="albumDetails" Grid.Column="2" IsEnabled="False">
+            <Grid x:Name="albumDetails" Grid.Column="2" Margin="0,6,0,0" IsEnabled="False">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -86,8 +86,8 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <DockPanel Grid.Column="0">
-                        <StackPanel Margin="0,6,0,6" DockPanel.Dock="Top" Orientation="Horizontal">
+                    <DockPanel Grid.Column="0" Margin="0,6,0,0">
+                        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,6" Orientation="Horizontal">
                             <Label Margin="0,0,6,0" FontWeight="Bold">Obrázky</Label>
                             <Button x:Name="addImageButton" Padding="12,0" IsEnabled="False">Přidat nový</Button>
                         </StackPanel>
@@ -100,6 +100,19 @@
                         <ListBox x:Name="images" Margin="6,0,6,6" IsEnabled="False"></ListBox>
                     </DockPanel>
                     <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="4" ShowsPreview="True" />
+                    <Grid x:Name="imageDetails" Grid.Column="2" Margin="0,6,0,0" IsEnabled="False">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <DockPanel Grid.Row="0">
+                            <Label Margin="0,0,6,0" FontWeight="Bold">Obrázek</Label>
+                            <Button x:Name="imageSrcButton" Margin="0,0,6,0" Padding="12,0" DockPanel.Dock="Right">Změnit</Button>
+                            <Label x:Name="imageSrc" Margin="0,0,12,0" Foreground="Gray">Žádný</Label>
+                        </DockPanel>
+                    </Grid>
                 </Grid>
             </Grid>
         </Grid>
