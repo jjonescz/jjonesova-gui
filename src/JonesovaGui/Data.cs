@@ -1,10 +1,9 @@
-﻿using Markdig;
-using Markdig.Extensions.Yaml;
-using Markdig.Syntax;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Media;
 using YamlDotNet.Serialization;
@@ -16,6 +15,10 @@ namespace JonesovaGui
     {
         class Data
         {
+            private static readonly Regex frontMatterSeparator =
+                new Regex("^---\r?$", RegexOptions.Multiline);
+            private readonly IDeserializer deserializer;
+            private readonly ISerializer serializer;
             private readonly MainWindow window;
             private List<Album> albums;
             private List<string> categories;
@@ -23,6 +26,14 @@ namespace JonesovaGui
 
             public Data(MainWindow window)
             {
+                deserializer = new DeserializerBuilder()
+                    .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                    .Build();
+
+                serializer = new SerializerBuilder()
+                    .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                    .Build();
+
                 this.window = window;
                 window.categories.SelectionChanged += Categories_SelectionChanged;
                 window.albums.SelectionChanged += Albums_SelectionChanged;
@@ -33,13 +44,6 @@ namespace JonesovaGui
 
             public void Load()
             {
-                var pipeline = new MarkdownPipelineBuilder()
-                    .UseYamlFrontMatter()
-                    .Build();
-                var deserializer = new DeserializerBuilder()
-                    .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                    .Build();
-
                 var contentFolder = Path.Combine(window.repoPath, "content");
                 albums = Directory.EnumerateDirectories(contentFolder)
                     .Select(p =>
@@ -47,13 +51,17 @@ namespace JonesovaGui
                         var indexPath = Path.Combine(p, "_index.md");
                         Log.Debug("Data", $"Deserializing {indexPath}");
                         var indexContent = File.ReadAllText(indexPath);
-                        var markdown = Markdown.Parse(indexContent, pipeline);
-                        var yaml = markdown.Descendants<YamlFrontMatterBlock>()
-                            .Single().Lines.ToString();
+                        var parts = frontMatterSeparator.Split(indexContent, 3);
+                        Debug.Assert(string.IsNullOrEmpty(parts[0]));
+                        var yaml = parts[1];
+                        var text = parts[2];
                         return new Album
                         {
+                            Id = Path.GetFileName(p),
+                            DirectoryPath = p,
+                            IndexPath = indexPath,
                             Info = deserializer.Deserialize<AlbumInfo>(yaml),
-                            Content = indexContent
+                            Text = text
                         };
                     })
                     .ToList();
@@ -140,6 +148,18 @@ namespace JonesovaGui
             {
                 Log.Info("Data", "Saving changes");
 
+                foreach (var album in albums)
+                {
+                    var yaml = serializer.Serialize(album.Info);
+                    File.WriteAllLines(album.IndexPath, new[]
+                    {
+                        "---",
+                        yaml,
+                        "---",
+                        album.Text
+                    });
+                }
+
                 dirty = false;
                 window.saveButton.IsEnabled = false;
             }
@@ -171,8 +191,11 @@ namespace JonesovaGui
 
     class Album
     {
+        public string Id { get; set; }
+        public string DirectoryPath { get; set; }
+        public string IndexPath { get; set; }
         public AlbumInfo Info { get; set; }
-        public string Content { get; set; }
+        public string Text { get; set; }
 
         public override string ToString()
         {
@@ -182,7 +205,6 @@ namespace JonesovaGui
 
     class AlbumInfo
     {
-        public string Id { get; set; }
         public string Title { get; set; }
         public string Albumthumb { get; set; }
         public DateTime Date { get; set; }
