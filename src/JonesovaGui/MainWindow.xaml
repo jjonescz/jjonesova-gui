@@ -18,21 +18,25 @@
         <DockPanel Grid.Row="0">
             <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Přihlášení</Label>
             <Label x:Name="loginStatus" DockPanel.Dock="Left" Foreground="DarkOrange">Načítání...</Label>
-            <TextBox x:Name="tokenBox" VerticalAlignment="Center" Margin="6,0" Visibility="Collapsed" TextChanged="tokenBox_TextChanged"></TextBox>
+            <TextBox x:Name="tokenBox" VerticalAlignment="Center" Margin="6,0" Visibility="Collapsed" TextChanged="tokenBox_TextChanged"
+                     ToolTip="GitHub personal access token (with scope `repo`)"></TextBox>
         </DockPanel>
         <DockPanel Grid.Row="1">
             <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold" ToolTip="Hugo">Náhled</Label>
             <Label x:Name="previewStatus" DockPanel.Dock="Left" Foreground="Gray">Čeká...</Label>
-            <Button x:Name="previewButton" DockPanel.Dock="Right" HorizontalAlignment="Right" Padding="12,0" Margin="6,0">Zobrazit</Button>
+            <Button x:Name="previewButton" DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="12,0" Margin="6,0"
+                    ToolTip="hugo --gc server">Zobrazit náhled</Button>
         </DockPanel>
-        <StackPanel Grid.Row="2" Orientation="Horizontal">
+        <DockPanel Grid.Row="2">
             <Label Margin="0,0,6,0" FontWeight="Bold">Změny</Label>
             <Button x:Name="saveButton" Padding="12,0" Margin="6,0" IsEnabled="False">Uložit</Button>
             <Button x:Name="backupButton" Padding="12,0" Margin="6,0" IsEnabled="False" ToolTip="git commit">Zálohovat</Button>
             <Button x:Name="restoreButton" Padding="12,0" Margin="6,0" IsEnabled="False" ToolTip="git reset --hard">Obnovit předchozí zálohu...</Button>
             <Button x:Name="publishButton" Padding="12,0" Margin="6,0" IsEnabled="False" ToolTip="git pull &amp;&amp; git push">Zveřejnit</Button>
             <Label x:Name="deployStatus" Foreground="Gray" ToolTip="Netlify status badge">Čeká...</Label>
-        </StackPanel>
+            <Button x:Name="webButton" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="12,0" Margin="6,0"
+                    ToolTip="https://jjonesova.cz" Click="webButton_Click">Zobrazit web</Button>
+        </DockPanel>
         <DockPanel Grid.Row="3">
             <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Kategorie</Label>
             <Label x:Name="categoriesStatus" DockPanel.Dock="Left" Foreground="Gray">Čeká...</Label>

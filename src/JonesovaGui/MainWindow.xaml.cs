@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -66,6 +67,12 @@ namespace JonesovaGui
         {
             // Save Git token.
             File.WriteAllText(tokenPath, tokenBox.Text);
+        }
+
+        private void webButton_Click(object sender, RoutedEventArgs e)
+        {
+            Log.Debug("MainWindow", "Opening web");
+            Process.Start(new ProcessStartInfo("https://jjonesova.cz") { UseShellExecute = true });
         }
     }
 }
