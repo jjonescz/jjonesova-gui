@@ -39,8 +39,7 @@
         </DockPanel>
         <DockPanel Grid.Row="3">
             <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Kategorie</Label>
-            <Label x:Name="categoriesStatus" DockPanel.Dock="Left" Foreground="Gray">Čeká...</Label>
-            <ComboBox x:Name="categories" Margin="0,0,6,0" VerticalAlignment="Center" Visibility="Collapsed"></ComboBox>
+            <ComboBox x:Name="categories" Margin="0,0,6,0" VerticalAlignment="Center" IsEnabled="False"></ComboBox>
         </DockPanel>
         <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>
@@ -49,14 +48,22 @@
             </Grid.ColumnDefinitions>
             <DockPanel Grid.Column="0">
                 <Label DockPanel.Dock="Top" FontWeight="Bold">Album</Label>
-                <Label x:Name="albumsStatus" DockPanel.Dock="Top" Foreground="Gray">Čeká...</Label>
-                <StackPanel x:Name="albumOrder" DockPanel.Dock="Bottom" Margin="0,0,0,6" Orientation="Horizontal" VerticalAlignment="Top" Visibility="Collapsed">
+                <StackPanel x:Name="albumOrder" DockPanel.Dock="Bottom" Margin="0,0,0,6" Orientation="Horizontal" VerticalAlignment="Top" IsEnabled="False">
                     <Label Margin="0,0,6,0" FontWeight="Bold">Posunout</Label>
                     <Button Margin="0,0,6,0" x:Name="albumUpButton" Padding="12,0">⬆</Button>
                     <Button x:Name="albumDownButton" Padding="12,0">⬇</Button>
                 </StackPanel>
-                <ListBox x:Name="albums" Margin="6,0,0,6" Visibility="Collapsed"></ListBox>
+                <ListBox x:Name="albums" Margin="6,0,0,6" IsEnabled="False"></ListBox>
             </DockPanel>
+            <Grid x:Name="albumDetails" Grid.Column="1" IsEnabled="False">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <DockPanel Grid.Row="0">
+                    <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Titulek</Label>
+                    <TextBox x:Name="albumTitleBox" VerticalAlignment="Center" Margin="6,0"></TextBox>
+                </DockPanel>
+            </Grid>
         </Grid>
     </Grid>
 </Window>

@@ -68,8 +68,7 @@ namespace JonesovaGui
                 categories = albums.SelectMany(a => a.Info.Categories).Distinct().ToList();
 
                 window.categories.ItemsSource = categories;
-                window.categoriesStatus.Visibility = Visibility.Collapsed;
-                window.categories.Visibility = Visibility.Visible;
+                window.categories.IsEnabled = true;
 
                 window.categories.SelectedItem = null;
                 NoCategorySelected();
@@ -84,23 +83,17 @@ namespace JonesovaGui
                 }
                 else
                 {
-                    window.albumsStatus.Visibility = Visibility.Collapsed;
                     RefreshAlbums();
-                    window.albums.Visibility = Visibility.Visible;
+                    window.albums.IsEnabled = true;
                 }
             }
 
             private void Albums_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
             {
                 var album = window.albums.SelectedItem as Album;
-                if (album == null)
-                {
-                    window.albumOrder.Visibility = Visibility.Collapsed;
-                }
-                else
-                {
-                    window.albumOrder.Visibility = Visibility.Visible;
-                }
+                var hasAlbum = album != null;
+                window.albumOrder.IsEnabled = hasAlbum;
+                window.albumDetails.IsEnabled = hasAlbum;
             }
 
             private void AlbumUpButton_Click(object sender, RoutedEventArgs e)
@@ -177,10 +170,7 @@ namespace JonesovaGui
 
             private void NoCategorySelected()
             {
-                window.albumsStatus.Content = "Nejprve vyberte kategorii";
-                window.albumsStatus.Foreground = Brushes.Black;
-                window.albumsStatus.Visibility = Visibility.Visible;
-                window.albums.Visibility = Visibility.Collapsed;
+                window.albums.IsEnabled = false;
             }
 
             private void Changed()
