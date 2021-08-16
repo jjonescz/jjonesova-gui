@@ -41,6 +41,7 @@ namespace JonesovaGui
                 {
                     var windowText = File.ReadAllText(windowPath);
                     var coords = JsonSerializer.Deserialize<WindowCoordinates>(windowText);
+                    Log.Debug("MainWindow", $"Got coordinates {coords}");
                     Top = coords.Top;
                     Left = coords.Left;
                     Height = coords.Height;
