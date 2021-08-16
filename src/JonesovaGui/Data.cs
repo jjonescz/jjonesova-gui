@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using Slugify;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -20,6 +21,7 @@ namespace JonesovaGui
             private const string indexFileName = "_index.md";
             private static readonly Regex frontMatterSeparator =
                 new Regex("^---\r?$", RegexOptions.Multiline);
+            private readonly SlugHelper slugifier = new SlugHelper();
             private readonly IDeserializer deserializer;
             private readonly ISerializer serializer;
             private readonly MainWindow window;
@@ -81,6 +83,10 @@ namespace JonesovaGui
                     .Select(p =>
                     {
                         var indexPath = Path.Combine(p, indexFileName);
+
+                        // Ignore empty folders.
+                        if (!File.Exists(indexPath)) return null;
+
                         Log.Debug("Data", $"Deserializing {indexPath}");
                         var indexContent = File.ReadAllText(indexPath);
                         var parts = frontMatterSeparator.Split(indexContent, 3);
@@ -96,6 +102,7 @@ namespace JonesovaGui
                             Text = text
                         };
                     })
+                    .Where(a => a != null)
                     .ToList();
                 categories = albums.SelectMany(a => a.Info.Categories).Distinct().ToList();
 
@@ -388,11 +395,15 @@ namespace JonesovaGui
                     foreach (var album in albums)
                     {
                         // Normalize properties.
+                        album.Id = Slugify(album.Info.Title);
+                        album.DirectoryPath = Path.Combine(contentFolder, album.Id);
+                        album.IndexPath = Path.Combine(album.DirectoryPath, indexFileName);
                         foreach (var image in album.Info.Resources)
                         {
                             image.Src = $"/{album.Id}/{image.Src}";
                         }
 
+                        // Save Markdown.
                         var yaml = serializer.Serialize(album.Info);
                         Directory.CreateDirectory(album.DirectoryPath);
                         await File.WriteAllLinesAsync(album.IndexPath, new[]
@@ -442,6 +453,7 @@ namespace JonesovaGui
                                 }
 
                                 Log.Debug("Data", $"Copying image from {image.FullPath} to {fullPath}");
+                                Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
                                 File.Copy(image.FullPath, fullPath, overwrite: true);
 
                                 // Update full path (needed below when deleting
@@ -458,11 +470,17 @@ namespace JonesovaGui
                         if (!albums.Any(a => p.Equals(a.DirectoryPath, StringComparison.OrdinalIgnoreCase)))
                         {
                             var albumId = Path.GetFileName(p);
-                            var albumAssetsPath = Path.Combine(assetsFolder, p);
-                            Log.Debug("Data", $"Deleting album {albumId} at {p}");
-                            Directory.Delete(p, recursive: true);
-                            Log.Debug("Data", $"Deleting album assets at {albumAssetsPath}");
-                            Directory.Delete(albumAssetsPath, recursive: true);
+                            var albumAssetsPath = Path.Combine(assetsFolder, albumId);
+                            if (Directory.Exists(p))
+                            {
+                                Log.Debug("Data", $"Deleting album {albumId} at {p}");
+                                Directory.Delete(p, recursive: true);
+                            }
+                            if (Directory.Exists(albumAssetsPath))
+                            {
+                                Log.Debug("Data", $"Deleting album assets at {albumAssetsPath}");
+                                Directory.Delete(albumAssetsPath, recursive: true);
+                            }
                         }
                     }
 
@@ -581,9 +599,9 @@ namespace JonesovaGui
                 return $"{prefix}{separator}{number}";
             }
 
-            private static string Slugify(string name)
+            private string Slugify(string name)
             {
-                return name;
+                return slugifier.GenerateSlug(name).Trim('-');
             }
         }
     }
