@@ -58,10 +58,15 @@
             <Grid x:Name="albumDetails" Grid.Column="1" IsEnabled="False">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <DockPanel Grid.Row="0">
                     <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Titulek</Label>
                     <TextBox x:Name="albumTitleBox" VerticalAlignment="Center" Margin="6,0"></TextBox>
+                </DockPanel>
+                <DockPanel Grid.Row="1">
+                    <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Text</Label>
+                    <TextBox x:Name="albumTextBox" VerticalAlignment="Center" Margin="6,0" AcceptsReturn="True"></TextBox>
                 </DockPanel>
             </Grid>
         </Grid>

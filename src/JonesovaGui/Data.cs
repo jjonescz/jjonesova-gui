@@ -39,6 +39,7 @@ namespace JonesovaGui
                 window.albumUpButton.Click += AlbumUpButton_Click;
                 window.albumDownButton.Click += AlbumDownButton_Click;
                 window.albumTitleBox.TextChanged += AlbumTitleBox_TextChanged;
+                window.albumTextBox.TextChanged += AlbumTextBox_TextChanged;
                 window.saveButton.Click += SaveButton_Click;
             }
 
@@ -89,6 +90,7 @@ namespace JonesovaGui
                 window.albumOrder.IsEnabled = hasAlbum;
                 window.albumDetails.IsEnabled = hasAlbum;
                 window.albumTitleBox.Text = SelectedAlbum?.Info.Title;
+                window.albumTextBox.Text = SelectedAlbum?.Text;
             }
 
             private void AlbumUpButton_Click(object sender, RoutedEventArgs e)
@@ -135,10 +137,18 @@ namespace JonesovaGui
 
             private void AlbumTitleBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
             {
-                if (SelectedAlbum == null) return;
-                if (!string.Equals(SelectedAlbum.Info.Title, window.albumTitleBox.Text))
+                if (SelectedAlbum != null && !string.Equals(SelectedAlbum.Info.Title, window.albumTitleBox.Text))
                 {
                     SelectedAlbum.Info.Title = window.albumTitleBox.Text;
+                    Changed();
+                }
+            }
+
+            private void AlbumTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+            {
+                if (SelectedAlbum != null && !string.Equals(SelectedAlbum.Text, window.albumTextBox.Text))
+                {
+                    SelectedAlbum.Text = window.albumTextBox.Text;
                     Changed();
                 }
             }
