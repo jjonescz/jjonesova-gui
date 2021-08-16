@@ -176,6 +176,7 @@ namespace JonesovaGui
             {
                 window.saveButton.IsEnabled = true;
                 window.saveButton.Content = "Uložit";
+                window.git.RefreshStatus();
             }
         }
     }

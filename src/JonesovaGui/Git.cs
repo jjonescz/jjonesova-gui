@@ -207,26 +207,29 @@ namespace JonesovaGui
 
             public void RefreshStatus()
             {
+                // Note that all these buttons are enabled only if changes are saved.
+
                 var status = repo.RetrieveStatus();
-                if (status.IsDirty && !window.restoreButton.IsEnabled)
+                var dirty = status.IsDirty && !window.saveButton.IsEnabled;
+                if (dirty && !window.restoreButton.IsEnabled)
                 {
                     window.restoreButton.Content = "Obnovit předchozí zálohu...";
                 }
-                window.restoreButton.IsEnabled = status.IsDirty;
-                if (status.IsDirty && !window.backupButton.IsEnabled)
+                window.restoreButton.IsEnabled = dirty;
+                if (dirty && !window.backupButton.IsEnabled)
                 {
                     window.backupButton.Content = "Zálohovat";
                 }
-                window.backupButton.IsEnabled = status.IsDirty;
+                window.backupButton.IsEnabled = dirty;
 
                 if (!pushing)
                 {
-                    var pushed = repo.Head.TrackingDetails.AheadBy == 0;
-                    if (!pushed && !window.publishButton.IsEnabled)
+                    var pushDirty = repo.Head.TrackingDetails.AheadBy > 0 && !window.saveButton.IsEnabled;
+                    if (pushDirty && !window.publishButton.IsEnabled)
                     {
                         window.publishButton.Content = "Zveřejnit";
                     }
-                    window.publishButton.IsEnabled = !pushed;
+                    window.publishButton.IsEnabled = pushDirty;
                 }
 
                 Log.Debug("Git", $"Status: {status}; " +
