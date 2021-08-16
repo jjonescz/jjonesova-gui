@@ -426,7 +426,7 @@ namespace JonesovaGui
                     var anyCopied = false;
                     foreach (var album in albums)
                     {
-                        var existingNames = new HashSet<string>();
+                        var existingNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                         foreach (var image in album.Info.Resources)
                         {
                             if (string.IsNullOrEmpty(image.Src))
