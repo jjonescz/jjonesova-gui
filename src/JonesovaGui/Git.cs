@@ -176,6 +176,7 @@ namespace JonesovaGui
                 {
                     Log.Info("Git", $"Resetting repository ({changes} changes)");
                     repo.Reset(ResetMode.Hard);
+                    repo.RemoveUntrackedFiles();
                     Log.Debug("Git", $"Repository at commit {repo.Head.Tip.Sha}");
                     RefreshStatus();
                     window.restoreButton.Content = "✔ Obnoveno";
