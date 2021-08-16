@@ -72,7 +72,8 @@ namespace JonesovaGui
                 window.categories.ItemsSource = categories;
                 window.categories.IsEnabled = true;
 
-                window.categories.SelectedItem = null;
+                // Refresh data all the way down.
+                Categories_SelectionChanged(this, null);
             }
 
             private void Categories_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
@@ -161,6 +162,9 @@ namespace JonesovaGui
                 window.saveButton.IsEnabled = false;
                 window.saveButton.Content = "✔ Uloženo";
                 window.git.RefreshStatus();
+
+                // Refresh content.
+                Load();
             }
 
             private void RefreshAlbums()
