@@ -71,6 +71,9 @@ namespace JonesovaGui
 
             public void Load()
             {
+                var selectedAlbum = window.albums.SelectedIndex;
+                var selectedImage = window.images.SelectedIndex;
+
                 albums = Directory.EnumerateDirectories(contentFolder)
                     .Select(p =>
                     {
@@ -110,6 +113,10 @@ namespace JonesovaGui
 
                 // Refresh data all the way down.
                 Categories_SelectionChanged(this, null);
+
+                // Restore selections.
+                window.albums.SelectedIndex = selectedAlbum;
+                window.images.SelectedIndex = selectedImage;
             }
 
             private void Categories_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
