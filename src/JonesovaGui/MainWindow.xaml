@@ -23,9 +23,9 @@
         </DockPanel>
         <DockPanel Grid.Row="1">
             <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold" ToolTip="Hugo">Náhled</Label>
-            <Label x:Name="previewStatus" DockPanel.Dock="Left" Foreground="Gray">Čeká...</Label>
             <Button x:Name="previewButton" DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="12,0" Margin="6,0"
                     ToolTip="hugo --gc server">Zobrazit náhled</Button>
+            <Label x:Name="previewStatus" Foreground="Gray">Čeká...</Label>
         </DockPanel>
         <DockPanel Grid.Row="2">
             <Label Margin="0,0,6,0" FontWeight="Bold">Změny</Label>

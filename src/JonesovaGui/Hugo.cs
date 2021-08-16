@@ -130,11 +130,14 @@ namespace JonesovaGui
             {
                 Log.Error("Hugo", $"Stderr: {e.Data}");
 
-                _ = window.Dispatcher.InvokeAsync(() =>
+                if (!string.IsNullOrWhiteSpace(e.Data))
                 {
-                    window.previewStatus.Content = $"Chyba: {e.Data}";
-                    window.previewStatus.Foreground = Brushes.DarkRed;
-                });
+                    _ = window.Dispatcher.InvokeAsync(() =>
+                    {
+                        window.previewStatus.Content = $"Chyba: {e.Data}";
+                        window.previewStatus.Foreground = Brushes.DarkRed;
+                    });
+                }
             }
 
             private void Process_Exited(object sender, EventArgs e)
@@ -146,8 +149,12 @@ namespace JonesovaGui
 
                 _ = window.Dispatcher.InvokeAsync(() =>
                 {
-                    window.previewStatus.Content = $"Neaktivní";
-                    window.previewStatus.Foreground = Brushes.DarkRed;
+                    // If an error is displayed; do not overwrite it.
+                    if (window.previewStatus.Foreground != Brushes.DarkRed)
+                    {
+                        window.previewStatus.Content = $"Neaktivní";
+                        window.previewStatus.Foreground = Brushes.DarkRed;
+                    }
                 });
             }
 
