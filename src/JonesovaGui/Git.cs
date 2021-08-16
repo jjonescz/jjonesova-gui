@@ -44,7 +44,7 @@ namespace JonesovaGui
                             CredentialsProvider = Credentials,
                             OnProgress = p => Status("Přihlašování", p),
                             OnTransferProgress = p => Status("Přihlašování", p),
-                            OnCheckoutProgress = (p, c, t) => Status("Přihlašování", $"Checkout: {(double)c / t:p}"),
+                            OnCheckoutProgress = (p, c, t) => Status("Přihlašování", $"Rozbalování: {(double)c / t:p}"),
                             RecurseSubmodules = true
                         }));
                         repo = new Repository(window.repoPath);
@@ -103,8 +103,8 @@ namespace JonesovaGui
                 await Task.Run(() => repo.Network.Push(repo.Head, new PushOptions
                 {
                     CredentialsProvider = Credentials,
-                    OnPackBuilderProgress = (s, c, t) => Status("Nahrávání", $"Pack {s}: {(double)c / t:p}"),
-                    OnPushTransferProgress = (c, t, b) => Status("Nahrávání", $"Transfer: {(double)c / t:p}"),
+                    OnPackBuilderProgress = (s, c, t) => Status("Nahrávání", $"Zabalování {s}: {(double)c / t:p}"),
+                    OnPushTransferProgress = (c, t, b) => Status("Nahrávání", $"Přenos: {(double)c / t:p}"),
                     OnPushStatusError = e => error = e
                 }));
                 if (error != null)
@@ -134,7 +134,7 @@ namespace JonesovaGui
 
             private bool Status(string title, TransferProgress p)
             {
-                return Status(title, $"Transfer: {(double)p.ReceivedObjects / p.TotalObjects:p}");
+                return Status(title, $"Přenos: {(double)p.ReceivedObjects / p.TotalObjects:p}");
             }
 
             private Credentials Credentials(string url, string usernameFromUrl, SupportedCredentialTypes types)
