@@ -1,5 +1,7 @@
 # jjonesova.cz Admin GUI
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/e2783b12-7f6b-43b8-b6d5-40263e593941/deploy-status)](https://app.netlify.com/sites/jjonesova-admin/deploys)
+
 This program is a simple admin desktop GUI for website
 [jjonesova.cz](https://jjonesova.cz) ([hosted
 separately](https://github.com/jjonescz/jjonesova)).
