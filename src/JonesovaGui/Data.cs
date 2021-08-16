@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
-using System.Windows.Media;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -43,6 +42,8 @@ namespace JonesovaGui
                 window.saveButton.Click += SaveButton_Click;
             }
 
+            private Album SelectedAlbum => window.albums.SelectedItem as Album;
+
             public void Load()
             {
                 var contentFolder = Path.Combine(window.repoPath, "content");
@@ -72,30 +73,21 @@ namespace JonesovaGui
                 window.categories.IsEnabled = true;
 
                 window.categories.SelectedItem = null;
-                NoCategorySelected();
             }
 
             private void Categories_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
             {
                 var category = window.categories.SelectedItem as string;
-                if (category == null)
-                {
-                    NoCategorySelected();
-                }
-                else
-                {
-                    RefreshAlbums();
-                    window.albums.IsEnabled = true;
-                }
+                RefreshAlbums();
+                window.albums.IsEnabled = category != null;
             }
 
             private void Albums_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
             {
-                var album = window.albums.SelectedItem as Album;
-                var hasAlbum = album != null;
+                var hasAlbum = SelectedAlbum != null;
                 window.albumOrder.IsEnabled = hasAlbum;
                 window.albumDetails.IsEnabled = hasAlbum;
-                window.albumTitleBox.Text = album?.Info.Title;
+                window.albumTitleBox.Text = SelectedAlbum?.Info.Title;
             }
 
             private void AlbumUpButton_Click(object sender, RoutedEventArgs e)
@@ -114,7 +106,7 @@ namespace JonesovaGui
                     newDate = minus2 + (minus1 - minus2) / 2;
                 }
                 Log.Debug("Data", $"Moving album #{window.albums.SelectedIndex} up, setting its date to {newDate}");
-                (window.albums.SelectedItem as Album).Info.Date = newDate;
+                SelectedAlbum.Info.Date = newDate;
                 Changed();
                 RefreshAlbums();
             }
@@ -135,15 +127,19 @@ namespace JonesovaGui
                     newDate = plus1 + (plus2 - plus1) / 2;
                 }
                 Log.Debug("Data", $"Moving album #{window.albums.SelectedIndex} down, setting its date to {newDate}");
-                (window.albums.SelectedItem as Album).Info.Date = newDate;
+                SelectedAlbum.Info.Date = newDate;
                 Changed();
                 RefreshAlbums();
             }
 
             private void AlbumTitleBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
             {
-                (window.albums.SelectedItem as Album).Info.Title = window.albumTitleBox.Text;
-                Changed();
+                if (SelectedAlbum == null) return;
+                if (!string.Equals(SelectedAlbum.Info.Title, window.albumTitleBox.Text))
+                {
+                    SelectedAlbum.Info.Title = window.albumTitleBox.Text;
+                    Changed();
+                }
             }
 
             private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -174,11 +170,6 @@ namespace JonesovaGui
                     .Where(a => a.Info.Categories.Contains(category))
                     .OrderBy(a => a.Info.Date)
                     .ToList();
-            }
-
-            private void NoCategorySelected()
-            {
-                window.albums.IsEnabled = false;
             }
 
             private void Changed()
