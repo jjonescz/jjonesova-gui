@@ -24,6 +24,9 @@ namespace JonesovaGui
             {
                 this.window = window;
                 window.categories.SelectionChanged += Categories_SelectionChanged;
+                window.albums.SelectionChanged += Albums_SelectionChanged;
+                window.albumUpButton.Click += AlbumUpButton_Click;
+                window.albumDownButton.Click += AlbumDownButton_Click;
             }
 
             public void Load()
@@ -71,12 +74,71 @@ namespace JonesovaGui
                 else
                 {
                     window.albumsStatus.Visibility = Visibility.Collapsed;
-                    window.albums.ItemsSource = albums
-                        .Where(a => a.Info.Categories.Contains(category))
-                        .OrderBy(a => a.Info.Date)
-                        .ToList();
+                    RefreshAlbums();
                     window.albums.Visibility = Visibility.Visible;
                 }
+            }
+
+            private void Albums_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+            {
+                var album = window.albums.SelectedItem as Album;
+                if (album == null)
+                {
+                    window.albumOrder.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    window.albumOrder.Visibility = Visibility.Visible;
+                }
+            }
+
+            private void AlbumUpButton_Click(object sender, RoutedEventArgs e)
+            {
+                if (window.albums.SelectedIndex <= 0) return;
+                var minus1 = (window.albums.Items[window.albums.SelectedIndex - 1] as Album).Info.Date;
+                DateTime newDate;
+                if (window.albums.SelectedIndex == 1)
+                {
+                    newDate = minus1.AddDays(-1);
+                }
+                else
+                {
+                    var minus2 = (window.albums.Items[window.albums.SelectedIndex - 2] as Album).Info.Date;
+                    // Select midpoint between date of `minus2` and `minus1`.
+                    newDate = minus2 + (minus1 - minus2) / 2;
+                }
+                Log.Debug("Data", $"Moving album #{window.albums.SelectedIndex} up, setting its date to {newDate}");
+                (window.albums.SelectedItem as Album).Info.Date = newDate;
+                RefreshAlbums();
+            }
+
+            private void AlbumDownButton_Click(object sender, RoutedEventArgs e)
+            {
+                if (window.albums.SelectedIndex >= window.albums.Items.Count - 1) return;
+                var plus1 = (window.albums.Items[window.albums.SelectedIndex + 1] as Album).Info.Date;
+                DateTime newDate;
+                if (window.albums.SelectedIndex == window.albums.Items.Count - 2)
+                {
+                    newDate = plus1.AddDays(1);
+                }
+                else
+                {
+                    var plus2 = (window.albums.Items[window.albums.SelectedIndex + 2] as Album).Info.Date;
+                    // Select midpoint between date of `plus1` and `plus2`.
+                    newDate = plus1 + (plus2 - plus1) / 2;
+                }
+                Log.Debug("Data", $"Moving album #{window.albums.SelectedIndex} down, setting its date to {newDate}");
+                (window.albums.SelectedItem as Album).Info.Date = newDate;
+                RefreshAlbums();
+            }
+
+            private void RefreshAlbums()
+            {
+                var category = window.categories.SelectedItem as string;
+                window.albums.ItemsSource = albums
+                    .Where(a => a.Info.Categories.Contains(category))
+                    .OrderBy(a => a.Info.Date)
+                    .ToList();
             }
 
             private void NoCategorySelected()
