@@ -32,6 +32,7 @@ namespace JonesovaGui
 
                 serializer = new SerializerBuilder()
                     .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                    .ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitEmptyCollections | DefaultValuesHandling.OmitDefaults)
                     .Build();
 
                 this.window = window;
@@ -206,8 +207,8 @@ namespace JonesovaGui
     class AlbumInfo
     {
         public string Title { get; set; }
-        public string Albumthumb { get; set; }
         public DateTime Date { get; set; }
+        public string Albumthumb { get; set; }
         public IList<string> Categories { get; set; }
         public IList<Image> Resources { get; set; }
     }
