@@ -10,7 +10,8 @@ Tooltips in the UI itself document some functionality.
 
 ## Release process
 
-1. Increment version!
-2. In Visual Studio, click Publish and use already-created ClickOnce profile.
-3. Copy contents of `src/JonesovaGui/bin/publish/` into
-   `https://jjonesova.cz/admin-app/`.
+1. In Visual Studio, click Publish and use already-created ClickOnce profile.
+2. Deploy contents of `src/JonesovaGui/bin/publish/` to some website, e.g.,
+   `https://jjonesova-admin.netlify.app/`.
+3. Look at <https://jjonesova-admin.netlify.app/publish.html>.
+4. Commit updated ClickOnce profile (it is keeping track of app version).
