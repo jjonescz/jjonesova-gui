@@ -10,6 +10,8 @@ namespace JonesovaGui
     public partial class MainWindow : Window
     {
         private readonly string tokenPath, repoPath;
+        private readonly Git git;
+        private readonly Data data;
 
         public MainWindow()
         {
@@ -17,6 +19,9 @@ namespace JonesovaGui
             repoPath = Path.GetFullPath("jjonesova.cz/repo");
 
             InitializeComponent();
+
+            git = new Git(this);
+            data = new Data(this);
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
@@ -26,13 +31,13 @@ namespace JonesovaGui
                 tokenBox.Text = File.ReadAllText(tokenPath);
 
             // Update Git repo.
-            await new Git(this).RefreshAsync();
+            await git.PullAsync();
 
             // Execute Hugo.
             new Hugo(this).Start();
 
             // Load content.
-            new Data(this).Load();
+            data.Load();
         }
 
         private void tokenBox_TextChanged(object sender, TextChangedEventArgs e)

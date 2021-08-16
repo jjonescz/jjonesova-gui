@@ -25,10 +25,11 @@
             <Label x:Name="previewStatus" DockPanel.Dock="Left" Foreground="Gray">Čeká...</Label>
             <Button x:Name="previewButton" DockPanel.Dock="Right" HorizontalAlignment="Right" Padding="12,0" Margin="6,0">Zobrazit</Button>
         </DockPanel>
-        <DockPanel Grid.Row="2">
-            <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Změny</Label>
-            <Button x:Name="saveButton" DockPanel.Dock="Right" HorizontalAlignment="Left" Padding="12,0" Margin="6,0" IsEnabled="False">Uložit</Button>
-        </DockPanel>
+        <StackPanel Grid.Row="2" Orientation="Horizontal">
+            <Label Margin="0,0,6,0" FontWeight="Bold">Změny</Label>
+            <Button x:Name="saveButton" Padding="12,0" Margin="6,0" IsEnabled="False">Uložit</Button>
+            <Button x:Name="restoreButton" Padding="12,0" Margin="6,0" IsEnabled="False">Obnovit předchozí zálohu...</Button>
+        </StackPanel>
         <DockPanel Grid.Row="3">
             <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Kategorie</Label>
             <Label x:Name="categoriesStatus" DockPanel.Dock="Left" Foreground="Gray">Čeká...</Label>

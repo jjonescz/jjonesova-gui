@@ -71,6 +71,7 @@ namespace JonesovaGui
                 window.categoriesStatus.Visibility = Visibility.Collapsed;
                 window.categories.Visibility = Visibility.Visible;
 
+                window.categories.SelectedItem = null;
                 NoCategorySelected();
             }
 
@@ -162,6 +163,7 @@ namespace JonesovaGui
 
                 window.saveButton.IsEnabled = false;
                 window.saveButton.Content = "✔ Uloženo";
+                window.git.RefreshStatus();
             }
 
             private void RefreshAlbums()

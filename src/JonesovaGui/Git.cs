@@ -1,6 +1,7 @@
 ﻿using LibGit2Sharp;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -12,6 +13,7 @@ namespace JonesovaGui
         class Git
         {
             private readonly MainWindow window;
+            private Repository repo;
 
             public Git(MainWindow window)
             {
@@ -19,9 +21,11 @@ namespace JonesovaGui
 
                 GlobalSettings.LogConfiguration = new LogConfiguration(LogLevel.Trace,
                     (level, message) => Log.Write(level, "Git", message));
+
+                window.restoreButton.Click += RestoreButton_Click;
             }
 
-            public async Task RefreshAsync()
+            public async Task PullAsync()
             {
                 Directory.CreateDirectory(window.repoPath);
                 try
@@ -38,11 +42,12 @@ namespace JonesovaGui
                             OnCheckoutProgress = (p, c, t) => Status("Přihlašování", $"Checkout: {(double)c / t:p}"),
                             RecurseSubmodules = true
                         }));
+                        repo = new Repository(window.repoPath);
                     }
                     else
                     {
                         // Pull repository.
-                        using var repo = new Repository(window.repoPath);
+                        repo = new Repository(window.repoPath);
                         var signature = new Signature("Jan Joneš", "jjones@outlook.cz", DateTimeOffset.Now);
                         var result = await Task.Run(() => Commands.Pull(repo, signature, new PullOptions
                         {
@@ -73,6 +78,8 @@ namespace JonesovaGui
                 window.loginStatus.Content = "Přihlášení úspěšné";
                 window.loginStatus.Foreground = Brushes.Black;
                 window.tokenBox.Visibility = Visibility.Collapsed;
+
+                RefreshStatus();
             }
 
             private bool Status(string title, string progress)
@@ -98,6 +105,35 @@ namespace JonesovaGui
                     Username = "jjonescz",
                     Password = window.Dispatcher.Invoke(() => window.tokenBox.Text)
                 };
+            }
+
+            private void RestoreButton_Click(object sender, RoutedEventArgs e)
+            {
+                var changes = repo.RetrieveStatus().Count();
+                var result = MessageBox.Show(window,
+                    $"Změny v {changes} souborech od předchozí zálohy (nebo předchozího publikování) budou zahozeny.",
+                    "Obnovit předchozí zálohu",
+                    MessageBoxButton.OKCancel,
+                    MessageBoxImage.Warning,
+                    MessageBoxResult.Cancel);
+                if (result == MessageBoxResult.OK)
+                {
+                    Log.Info("Git", $"Resetting repository ({changes} changes)");
+                    repo.Reset(ResetMode.Hard);
+                    window.restoreButton.IsEnabled = false;
+                    window.restoreButton.Content = "✔ Obnoveno";
+                    window.data.Load();
+                }
+            }
+
+            public void RefreshStatus()
+            {
+                var dirty = repo.RetrieveStatus().IsDirty;
+                if (dirty && !window.restoreButton.IsEnabled)
+                {
+                    window.restoreButton.Content = "Obnovit předchozí zálohu...";
+                }
+                window.restoreButton.IsEnabled = dirty;
             }
         }
     }
