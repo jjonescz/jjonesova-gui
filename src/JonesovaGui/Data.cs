@@ -72,7 +72,9 @@ namespace JonesovaGui
                 {
                     window.albumsStatus.Visibility = Visibility.Collapsed;
                     window.albums.ItemsSource = albums
-                        .Where(a => a.Info.Categories.Contains(category)).ToList();
+                        .Where(a => a.Info.Categories.Contains(category))
+                        .OrderBy(a => a.Info.Date)
+                        .ToList();
                     window.albums.Visibility = Visibility.Visible;
                 }
             }
