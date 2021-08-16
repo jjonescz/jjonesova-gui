@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Http;
-using System.Security.Cryptography;
 using System.Timers;
 using System.Windows.Media;
 
@@ -12,14 +10,9 @@ namespace JonesovaGui
         class Deploy
         {
             private const string statusBadgeUrl = "https://api.netlify.com/api/v1/badges/525cc64c-f176-4033-a85d-e727c17b29cd/deploy-status";
-            private static readonly byte[] successHash = Convert.FromBase64String("/2QIxioKQdYi5UgeY+yvQJlHY/0BPPYoauDCAxZwIF4=");
-            private static readonly byte[] buildingHash = Convert.FromBase64String("");
-            private static readonly byte[] canceledHash = Convert.FromBase64String("");
-            private static readonly byte[] failedHash = Convert.FromBase64String("");
             private readonly MainWindow window;
             private readonly Timer timer;
             private readonly HttpClient client;
-            private readonly HashAlgorithm hasher;
             private DeployStatus previousStatus;
 
             public Deploy(MainWindow window)
@@ -32,7 +25,6 @@ namespace JonesovaGui
                 };
                 timer.Elapsed += Timer_Elapsed;
                 client = new HttpClient();
-                hasher = SHA256.Create();
             }
 
             public void Detect()
@@ -66,53 +58,63 @@ namespace JonesovaGui
                     return;
                 }
 
-                // Detect state from hash of the badge.
-                var stream = await response.Content.ReadAsStreamAsync();
-                var hash = await hasher.ComputeHashAsync(stream);
-                var hashString = Convert.ToBase64String(hash);
-                Log.Debug("Deploy", $"Got status badge with hash {hashString}");
+                // Detect state from color used inside SVG of the badge.
+                var svg = await response.Content.ReadAsStringAsync();
 
-                if (hash.SequenceEqual(successHash))
+                // Colors can be obtained from
+                // https://github.com/badges/shields/blob/23c0406bedfc6930735e8f5ea75dfe34faf1f290/services/netlify/netlify.service.js#L55-L57
+                // but we used more thorough manual inspection of image in
+                // https://docs.netlify.com/monitor-sites/status-badges/.
+                bool HasColor(string color)
                 {
-                    _ = window.Dispatcher.InvokeAsync(() =>
-                    {
-                        window.deployStatus.Content = "Zveřejněno";
-                        window.deployStatus.Foreground = Brushes.Green;
-                    });
-                    Changed(DeployStatus.Success);
+                    return svg.Contains(color, StringComparison.OrdinalIgnoreCase);
                 }
-                else if (hash.SequenceEqual(buildingHash))
+                var status = svg switch
                 {
-                    _ = window.Dispatcher.InvokeAsync(() =>
-                    {
-                        window.deployStatus.Content = "Zveřejněvání...";
-                        window.deployStatus.Foreground = Brushes.DarkOrange;
-                    });
-                    Changed(DeployStatus.Building);
-                }
-                else if (hash.SequenceEqual(canceledHash) || hash.SequenceEqual(failedHash))
+                    _ when HasColor("#c9eeeb") => DeployStatus.Success,
+                    _ when HasColor("#fed7e2") => DeployStatus.Failed,
+                    _ when HasColor("#ffe4c2") => DeployStatus.Building,
+                    _ when HasColor("#e9eaeb") => DeployStatus.Canceled,
+                    _ => DeployStatus.Unknown
+                };
+
+                Log.Debug("Deploy", $"Got status badge {status}");
+
+                switch (status)
                 {
-                    Log.Warn("Deploy", "Deployment failed/canceled");
-                    _ = window.Dispatcher.InvokeAsync(() =>
-                    {
-                        window.deployStatus.Content = "Zveřejnění selhalo";
-                        window.deployStatus.Foreground = Brushes.DarkRed;
-                    });
-                    if (hash.SequenceEqual(canceledHash))
-                        Changed(DeployStatus.Canceled);
-                    else
-                        Changed(DeployStatus.Failed);
+                    case DeployStatus.Success:
+                        _ = window.Dispatcher.InvokeAsync(() =>
+                        {
+                            window.deployStatus.Content = "Zveřejněno";
+                            window.deployStatus.Foreground = Brushes.Green;
+                        });
+                        break;
+                    case DeployStatus.Building:
+                        _ = window.Dispatcher.InvokeAsync(() =>
+                        {
+                            window.deployStatus.Content = "Zveřejněvání...";
+                            window.deployStatus.Foreground = Brushes.DarkOrange;
+                        });
+                        break;
+                    case DeployStatus.Canceled:
+                    case DeployStatus.Failed:
+                        Log.Warn("Deploy", "Deployment failed/canceled");
+                        _ = window.Dispatcher.InvokeAsync(() =>
+                        {
+                            window.deployStatus.Content = "Zveřejnění selhalo";
+                            window.deployStatus.Foreground = Brushes.DarkRed;
+                        });
+                        break;
+                    default:
+                        Log.Error("Deploy", $"Unrecognized status badge {svg}");
+                        _ = window.Dispatcher.InvokeAsync(() =>
+                        {
+                            window.deployStatus.Content = "Neznámý stav zveřejnění";
+                            window.deployStatus.Foreground = Brushes.DarkRed;
+                        });
+                        break;
                 }
-                else
-                {
-                    Log.Error("Deploy", $"Unrecognized status badge hash {hashString}");
-                    _ = window.Dispatcher.InvokeAsync(() =>
-                    {
-                        window.deployStatus.Content = "Neznámý stav zveřejnění";
-                        window.deployStatus.Foreground = Brushes.DarkRed;
-                    });
-                    Changed(DeployStatus.Unknown);
-                }
+                Changed(status);
             }
 
             private void Changed(DeployStatus status)
