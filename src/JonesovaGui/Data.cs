@@ -598,7 +598,12 @@ namespace JonesovaGui
                 {
                     window.saveButton.IsEnabled = true;
                     window.saveButton.Content = "Uložit";
-                    window.git.RefreshStatus();
+
+                    // Disable Git buttons.
+                    // IMPORTANT: Keep consistent with `Git.RefreshStatus`.
+                    window.restoreButton.IsEnabled = false;
+                    window.backupButton.IsEnabled = false;
+                    window.publishButton.IsEnabled = false;
                 }
             }
 

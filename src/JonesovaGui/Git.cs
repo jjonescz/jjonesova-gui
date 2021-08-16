@@ -208,6 +208,7 @@ namespace JonesovaGui
             public void RefreshStatus()
             {
                 // Note that all these buttons are enabled only if changes are saved.
+                // IMPORTANT: Keep consistent with `Data.Changed`.
 
                 var status = repo.RetrieveStatus();
                 var dirty = status.IsDirty && !window.saveButton.IsEnabled;
