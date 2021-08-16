@@ -40,6 +40,23 @@ namespace JonesovaGui
             data.Load();
         }
 
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (saveButton.IsEnabled)
+            {
+                var result = MessageBox.Show(this,
+                    "Neuložené změny budou zahozeny!",
+                    "Zavírání programu jjonesova.cz",
+                    MessageBoxButton.OKCancel,
+                    MessageBoxImage.Warning,
+                    MessageBoxResult.Cancel);
+                if (result != MessageBoxResult.OK)
+                {
+                    e.Cancel = true;
+                }
+            }
+        }
+
         private void tokenBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             // Save Git token.
