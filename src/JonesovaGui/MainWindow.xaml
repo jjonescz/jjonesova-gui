@@ -103,8 +103,6 @@
                     <Grid x:Name="imageDetails" Grid.Column="2" Margin="0,6,0,0" IsEnabled="False">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <DockPanel Grid.Row="0">
@@ -112,6 +110,7 @@
                             <Button x:Name="imageSrcButton" Margin="0,0,6,0" Padding="12,0" DockPanel.Dock="Right">Změnit</Button>
                             <Label x:Name="imageSrc" Margin="0,0,12,0" Foreground="Gray">Žádný</Label>
                         </DockPanel>
+                        <Image x:Name="image" Grid.Row="1" Margin="6"></Image>
                     </Grid>
                 </Grid>
             </Grid>

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -91,6 +92,18 @@ namespace JonesovaGui
                     .ToList();
                 categories = albums.SelectMany(a => a.Info.Categories).Distinct().ToList();
 
+                // Initialize `Image.FullPath` properties.
+                foreach (var album in albums)
+                {
+                    foreach (var image in album.Info.Resources)
+                    {
+                        if (!string.IsNullOrEmpty(image.Src))
+                        {
+                            image.FullPath = Path.Combine(assetsFolder, $"./{image.Src}");
+                        }
+                    }
+                }
+
                 window.categories.ItemsSource = categories;
                 window.categories.IsEnabled = true;
 
@@ -136,6 +149,8 @@ namespace JonesovaGui
                     window.imageSrc.Content = Path.GetFileName(src);
                     window.imageSrc.Foreground = Brushes.Black;
                 }
+                window.image.Source = SelectedImage?.FullPath == null ? null :
+                    new BitmapImage(new Uri(SelectedImage.FullPath, UriKind.Absolute));
             }
 
             private void AddAlbumButton_Click(object sender, RoutedEventArgs e)
@@ -411,6 +426,8 @@ namespace JonesovaGui
 
     class Image
     {
+        [YamlIgnore]
+        public string FullPath { get; set; }
         public string Src { get; set; }
         public string Phototitle { get; set; }
         public string Description { get; set; }
