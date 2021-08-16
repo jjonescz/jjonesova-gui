@@ -21,7 +21,7 @@
             <TextBox x:Name="tokenBox" VerticalAlignment="Center" Margin="6,0" Visibility="Collapsed" TextChanged="tokenBox_TextChanged"></TextBox>
         </DockPanel>
         <DockPanel Grid.Row="1">
-            <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Náhled</Label>
+            <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold" ToolTip="Hugo">Náhled</Label>
             <Label x:Name="previewStatus" DockPanel.Dock="Left" Foreground="Gray">Čeká...</Label>
             <Button x:Name="previewButton" DockPanel.Dock="Right" HorizontalAlignment="Right" Padding="12,0" Margin="6,0">Zobrazit</Button>
         </DockPanel>
@@ -30,7 +30,8 @@
             <Button x:Name="saveButton" Padding="12,0" Margin="6,0" IsEnabled="False">Uložit</Button>
             <Button x:Name="backupButton" Padding="12,0" Margin="6,0" IsEnabled="False" ToolTip="git commit">Zálohovat</Button>
             <Button x:Name="restoreButton" Padding="12,0" Margin="6,0" IsEnabled="False" ToolTip="git reset --hard">Obnovit předchozí zálohu...</Button>
-            <Label x:Name="deployStatus" Foreground="Gray">Čeká...</Label>
+            <Button x:Name="publishButton" Padding="12,0" Margin="6,0" IsEnabled="False" ToolTip="git pull &amp;&amp; git push">Zveřejnit</Button>
+            <Label x:Name="deployStatus" Foreground="Gray" ToolTip="Netlify status badge">Čeká...</Label>
         </StackPanel>
         <DockPanel Grid.Row="3">
             <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Kategorie</Label>

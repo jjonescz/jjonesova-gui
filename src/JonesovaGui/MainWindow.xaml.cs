@@ -33,7 +33,7 @@ namespace JonesovaGui
                 tokenBox.Text = File.ReadAllText(tokenPath);
 
             // Update Git repo.
-            await git.PullAsync();
+            await git.UpdateAsync();
 
             // Execute Hugo.
             new Hugo(this).Start();
