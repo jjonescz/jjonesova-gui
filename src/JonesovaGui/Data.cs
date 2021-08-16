@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
-using System.Windows.Data;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -21,7 +20,7 @@ namespace JonesovaGui
             private readonly IDeserializer deserializer;
             private readonly ISerializer serializer;
             private readonly MainWindow window;
-            private readonly string contentFolder;
+            private readonly string contentFolder, assetsFolder;
             private List<Album> albums;
             private List<string> categories;
 
@@ -38,10 +37,12 @@ namespace JonesovaGui
 
                 this.window = window;
                 contentFolder = Path.Combine(window.repoPath, "content");
+                assetsFolder = Path.Combine(window.repoPath, "assets");
 
                 window.categories.SelectionChanged += Categories_SelectionChanged;
-                window.addAlbumButton.Click += AddAlbumButton_Click;
                 window.albums.SelectionChanged += Albums_SelectionChanged;
+                window.addAlbumButton.Click += AddAlbumButton_Click;
+                window.addImageButton.Click += AddImageButton_Click;
                 window.albumUpButton.Click += AlbumUpButton_Click;
                 window.albumDownButton.Click += AlbumDownButton_Click;
                 window.albumDeleteButton.Click += AlbumDeleteButton_Click;
@@ -52,6 +53,7 @@ namespace JonesovaGui
             }
 
             private Album SelectedAlbum => window.albums.SelectedItem as Album;
+            private Image SelectedImage => window.images.SelectedItem as Image;
 
             public void Load()
             {
@@ -93,9 +95,22 @@ namespace JonesovaGui
                 window.addAlbumButton.IsEnabled = hasCategory;
             }
 
+            private void Albums_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+            {
+                var hasAlbum = SelectedAlbum != null;
+                window.albumOrder.IsEnabled = hasAlbum;
+                window.albumDetails.IsEnabled = hasAlbum;
+                window.albumTitleBox.Text = SelectedAlbum?.Info.Title;
+                window.albumCategoriesBox.Text = SelectedAlbum == null ? null : string.Join(", ", SelectedAlbum.Info.Categories);
+                window.albumTextBox.Text = SelectedAlbum?.Text;
+                RefreshImages();
+                window.images.IsEnabled = hasAlbum;
+                window.addImageButton.IsEnabled = hasAlbum;
+            }
+
             private void AddAlbumButton_Click(object sender, RoutedEventArgs e)
             {
-                // Fund unused title.
+                // Find unused title.
                 var number = 1;
                 string Title() => GetName("Album", number);
                 while (albums.Any(a => Title().Equals(a.Info.Title))) number++;
@@ -124,17 +139,19 @@ namespace JonesovaGui
                 window.albums.SelectedItem = album;
             }
 
-            private void Albums_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+            private void AddImageButton_Click(object sender, RoutedEventArgs e)
             {
-                var hasAlbum = SelectedAlbum != null;
-                window.albumOrder.IsEnabled = hasAlbum;
-                window.albumDetails.IsEnabled = hasAlbum;
-                window.albumTitleBox.Text = SelectedAlbum?.Info.Title;
-                window.albumCategoriesBox.Text = SelectedAlbum == null ? null : string.Join(", ", SelectedAlbum.Info.Categories);
-                window.albumTextBox.Text = SelectedAlbum?.Text;
+                // Add new image.
+                var image = new Image
+                {
+                    Description = "Obrázek"
+                };
+                SelectedAlbum.Info.Resources.Add(image);
+                Changed();
+
+                // Select it.
                 RefreshImages();
-                window.images.IsEnabled = hasAlbum;
-                window.addImageButton.IsEnabled = hasAlbum;
+                window.images.SelectedItem = image;
             }
 
             private void AlbumUpButton_Click(object sender, RoutedEventArgs e)
@@ -235,7 +252,7 @@ namespace JonesovaGui
                         album.Text
                     });
                 }
-                
+
                 // Delete albums.
                 foreach (var p in Directory.EnumerateDirectories(contentFolder))
                 {
@@ -264,7 +281,7 @@ namespace JonesovaGui
 
             private void RefreshImages()
             {
-                window.images.ItemsSource = SelectedAlbum?.Info.Resources;
+                window.images.ItemsSource = SelectedAlbum?.Info.Resources.ToList();
             }
 
             private void Changed()
@@ -322,7 +339,7 @@ namespace JonesovaGui
 
         public override string ToString()
         {
-            return Path.GetFileName(Src);
+            return Src == null ? Description : Path.GetFileName(Src);
         }
     }
 
