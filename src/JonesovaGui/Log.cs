@@ -8,6 +8,8 @@ namespace JonesovaGui
     static class Log
     {
         public static readonly string RootPath = Path.GetFullPath("jjonesova.cz");
+        public static readonly string LogsDirectoryPath = Path.Combine(RootPath, "logs");
+        public static readonly string LogPath = Path.Combine(LogsDirectoryPath, $"{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss-fffffff}.txt");
         private static readonly StreamWriter file = Open();
         private static readonly object syncRoot = new object();
 
@@ -50,10 +52,8 @@ namespace JonesovaGui
 
         private static StreamWriter Open()
         {
-            var logsPath = Path.Combine(RootPath, "logs");
-            Directory.CreateDirectory(logsPath);
-            var logPath = Path.Combine(logsPath, $"{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss-fffffff}.txt");
-            return new StreamWriter(logPath);
+            Directory.CreateDirectory(LogsDirectoryPath);
+            return new StreamWriter(LogPath);
         }
     }
 }
