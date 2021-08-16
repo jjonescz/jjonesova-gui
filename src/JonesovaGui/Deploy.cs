@@ -20,6 +20,7 @@ namespace JonesovaGui
             private readonly Timer timer;
             private readonly HttpClient client;
             private readonly HashAlgorithm hasher;
+            private DeployStatus previousStatus;
 
             public Deploy(MainWindow window)
             {
@@ -38,8 +39,13 @@ namespace JonesovaGui
             {
                 if (!timer.Enabled)
                 {
+                    Log.Debug("Deploy", $"Starting checking status (previously {previousStatus})");
                     Timer_Elapsed(this, null); // Initial check.
                     timer.Start();
+                }
+                else
+                {
+                    Log.Warn("Deploy", $"Wanting to start checking that is already started (currenty {previousStatus})");
                 }
             }
 
@@ -73,7 +79,7 @@ namespace JonesovaGui
                         window.deployStatus.Content = "Zveřejněno";
                         window.deployStatus.Foreground = Brushes.Green;
                     });
-                    timer.Stop();
+                    Changed(DeployStatus.Success);
                 }
                 else if (hash.SequenceEqual(buildingHash))
                 {
@@ -82,7 +88,7 @@ namespace JonesovaGui
                         window.deployStatus.Content = "Zveřejněvání...";
                         window.deployStatus.Foreground = Brushes.DarkOrange;
                     });
-                    // Continue timer => continue checking until some definitive change.
+                    Changed(DeployStatus.Building);
                 }
                 else if (hash.SequenceEqual(canceledHash) || hash.SequenceEqual(failedHash))
                 {
@@ -92,7 +98,10 @@ namespace JonesovaGui
                         window.deployStatus.Content = "Zveřejnění selhalo";
                         window.deployStatus.Foreground = Brushes.DarkRed;
                     });
-                    timer.Stop();
+                    if (hash.SequenceEqual(canceledHash))
+                        Changed(DeployStatus.Canceled);
+                    else
+                        Changed(DeployStatus.Failed);
                 }
                 else
                 {
@@ -102,9 +111,46 @@ namespace JonesovaGui
                         window.deployStatus.Content = "Neznámý stav zveřejnění";
                         window.deployStatus.Foreground = Brushes.DarkRed;
                     });
+                    Changed(DeployStatus.Unknown);
+                }
+            }
+
+            private void Changed(DeployStatus status)
+            {
+                try
+                {
+                    if (previousStatus == status)
+                    {
+                        // Continue checking, until status changes for the first time.
+                        Log.Debug("Deploy", $"Same state ({status}), checking continues");
+                        return;
+                    }
+
+                    if (status == DeployStatus.Building)
+                    {
+                        // Continue checking while build is in progress.
+                        Log.Debug("Deploy", $"Build in progress (previously {previousStatus}), checking continues");
+                        return;
+                    }
+
+                    // Otherwise, stop timer; we got some status change.
                     timer.Stop();
+                    Log.Debug("Deploy", $"Got state {status} (previously {previousStatus}), checking stopped");
+                }
+                finally
+                {
+                    previousStatus = status;
                 }
             }
         }
+    }
+
+    public enum DeployStatus
+    {
+        Unknown,
+        Success,
+        Building,
+        Canceled,
+        Failed
     }
 }
