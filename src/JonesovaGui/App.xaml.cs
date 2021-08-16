@@ -1,5 +1,4 @@
-﻿using LibGit2Sharp;
-using System.Windows;
+﻿using System.Windows;
 
 namespace JonesovaGui
 {
