@@ -134,47 +134,12 @@ namespace JonesovaGui
                 window.addImageButton.IsEnabled = hasAlbum;
             }
 
-            private async void Images_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+            private void Images_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
             {
                 var hasImage = SelectedImage != null;
                 window.imageOrder.IsEnabled = hasImage;
                 window.imageDetails.IsEnabled = hasImage;
-
-                // Show source file name.
-                var src = SelectedImage?.Src;
-                if (string.IsNullOrEmpty(src))
-                {
-                    window.imageSrc.Content = "Žádný";
-                    window.imageSrc.Foreground = Brushes.Gray;
-                }
-                else
-                {
-                    window.imageSrc.Content = Path.GetFileName(src);
-                    window.imageSrc.Foreground = Brushes.Black;
-                }
-
-                // Load image in background.
-                window.image.Source = null;
-                var fullPath = SelectedImage?.FullPath;
-                if (fullPath != null)
-                {
-                    window.imageStatus.Visibility = Visibility.Visible;
-                    var uri = new Uri(fullPath, UriKind.Absolute);
-                    var bitmap = await Task.Run(() =>
-                    {
-                        var image = new BitmapImage();
-                        image.BeginInit();
-                        image.UriSource = uri;
-                        image.EndInit();
-                        image.Freeze();
-                        return image;
-                    });
-                    _ = window.Dispatcher.InvokeAsync(() =>
-                    {
-                        window.imageStatus.Visibility = Visibility.Collapsed;
-                        window.image.Source = bitmap;
-                    });
-                }
+                RefreshImage();
             }
 
             private void AddAlbumButton_Click(object sender, RoutedEventArgs e)
@@ -348,8 +313,11 @@ namespace JonesovaGui
                     lastDir = Path.GetDirectoryName(dialog.FileName);
                     File.WriteAllText(lastDirPath, lastDir);
 
-                    window.imageSrc.Content = Path.GetFileName(dialog.FileName);
-                    window.imageSrc.Foreground = Brushes.Black;
+                    // Update file path.
+                    SelectedImage.FullPath = dialog.FileName;
+                    SelectedImage.Src = Path.GetFileName(dialog.FileName);
+                    Changed();
+                    RefreshImage();
                 }
             }
 
@@ -400,6 +368,45 @@ namespace JonesovaGui
             private void RefreshImages()
             {
                 window.images.ItemsSource = SelectedAlbum?.Info.Resources.ToList();
+            }
+
+            private async void RefreshImage()
+            {
+                // Show source file name.
+                var src = SelectedImage?.Src;
+                if (string.IsNullOrEmpty(src))
+                {
+                    window.imageSrc.Content = "Žádný";
+                    window.imageSrc.Foreground = Brushes.Gray;
+                }
+                else
+                {
+                    window.imageSrc.Content = Path.GetFileName(src);
+                    window.imageSrc.Foreground = Brushes.Black;
+                }
+
+                // Load image in background.
+                window.image.Source = null;
+                var fullPath = SelectedImage?.FullPath;
+                if (fullPath != null)
+                {
+                    window.imageStatus.Visibility = Visibility.Visible;
+                    var uri = new Uri(fullPath, UriKind.Absolute);
+                    var bitmap = await Task.Run(() =>
+                    {
+                        var image = new BitmapImage();
+                        image.BeginInit();
+                        image.UriSource = uri;
+                        image.EndInit();
+                        image.Freeze();
+                        return image;
+                    });
+                    _ = window.Dispatcher.InvokeAsync(() =>
+                    {
+                        window.imageStatus.Visibility = Visibility.Collapsed;
+                        window.image.Source = bitmap;
+                    });
+                }
             }
 
             private void Changed()
