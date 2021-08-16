@@ -2,7 +2,7 @@
 
 This program is a simple admin desktop GUI for website
 [jjonesova.cz](https://jjonesova.cz) ([hosted
-separately](https://github.com/jjonescz)).
+separately](https://github.com/jjonescz/jjonesova)).
 
 ## Documentation
 
