@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Data;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -45,6 +46,7 @@ namespace JonesovaGui
                 window.albumDownButton.Click += AlbumDownButton_Click;
                 window.albumDeleteButton.Click += AlbumDeleteButton_Click;
                 window.albumTitleBox.TextChanged += AlbumTitleBox_TextChanged;
+                window.albumCategoriesBox.TextChanged += AlbumCategoriesBox_TextChanged;
                 window.albumTextBox.TextChanged += AlbumTextBox_TextChanged;
                 window.saveButton.Click += SaveButton_Click;
             }
@@ -128,6 +130,7 @@ namespace JonesovaGui
                 window.albumOrder.IsEnabled = hasAlbum;
                 window.albumDetails.IsEnabled = hasAlbum;
                 window.albumTitleBox.Text = SelectedAlbum?.Info.Title;
+                window.albumCategoriesBox.Text = SelectedAlbum == null ? null : string.Join(", ", SelectedAlbum.Info.Categories);
                 window.albumTextBox.Text = SelectedAlbum?.Text;
             }
 
@@ -189,6 +192,20 @@ namespace JonesovaGui
                 }
             }
 
+            private void AlbumCategoriesBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+            {
+                var categories = (window.albumCategoriesBox.Text ?? string.Empty)
+                    .Split(',')
+                    .Select(c => c.Trim())
+                    .Where(c => !string.IsNullOrEmpty(c))
+                    .ToHashSet();
+                if (SelectedAlbum != null && !categories.SetEquals(SelectedAlbum.Info.Categories))
+                {
+                    SelectedAlbum.Info.Categories = categories.ToList();
+                    Changed();
+                }
+            }
+
             private void AlbumTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
             {
                 if (SelectedAlbum != null && !string.Equals(SelectedAlbum.Text, window.albumTextBox.Text))
@@ -244,9 +261,12 @@ namespace JonesovaGui
 
             private void Changed()
             {
-                window.saveButton.IsEnabled = true;
-                window.saveButton.Content = "Uložit";
-                window.git.RefreshStatus();
+                if (!window.saveButton.IsEnabled)
+                {
+                    window.saveButton.IsEnabled = true;
+                    window.saveButton.Content = "Uložit";
+                    window.git.RefreshStatus();
+                }
             }
 
             private static string GetName(string prefix, int number)
