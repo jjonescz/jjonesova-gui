@@ -92,7 +92,7 @@ namespace JonesovaGui
                     case DeployStatus.Building:
                         _ = window.Dispatcher.InvokeAsync(() =>
                         {
-                            window.deployStatus.Content = "Zveřejněvání...";
+                            window.deployStatus.Content = "Zveřejňování...";
                             window.deployStatus.Foreground = Brushes.DarkOrange;
                         });
                         break;

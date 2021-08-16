@@ -193,7 +193,14 @@ namespace JonesovaGui
                 RefreshStatus();
                 if (result)
                 {
-                    window.publishButton.Content = "✔ Zveřejňeno";
+                    window.loginStatus.Content = "Nahrání úspěšné";
+                    window.loginStatus.Foreground = Brushes.Black;
+                    window.tokenBox.Visibility = Visibility.Collapsed;
+
+                    window.publishButton.Content = "✔ Zveřejněno";
+
+                    // Start checking deploy status.
+                    window.deploy.Detect();
                 }
             }
 
