@@ -544,6 +544,9 @@ namespace JonesovaGui
                         var image = new BitmapImage();
                         image.BeginInit();
                         image.UriSource = uri;
+                        // Caching is required, so that the image can be moved
+                        // even when displayed.
+                        image.CacheOption = BitmapCacheOption.OnLoad;
                         if (exif) image.Rotation = DetectRotation(fullPath);
                         image.EndInit();
                         image.Freeze();
