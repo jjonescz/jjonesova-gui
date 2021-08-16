@@ -34,7 +34,10 @@ namespace JonesovaGui
 
             private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
             {
-                process?.Kill();
+                if (!e.Cancel)
+                {
+                    process?.Kill();
+                }
             }
 
             public void Start()
