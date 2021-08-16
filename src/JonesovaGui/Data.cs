@@ -54,7 +54,7 @@ namespace JonesovaGui
                         var parts = frontMatterSeparator.Split(indexContent, 3);
                         Debug.Assert(string.IsNullOrEmpty(parts[0]));
                         var yaml = parts[1];
-                        var text = parts[2];
+                        var text = parts[2].Trim('\r', '\n');
                         return new Album
                         {
                             Id = Path.GetFileName(p),
