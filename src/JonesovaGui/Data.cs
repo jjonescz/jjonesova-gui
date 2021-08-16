@@ -64,6 +64,7 @@ namespace JonesovaGui
                 window.albumCategoriesBox.TextChanged += AlbumCategoriesBox_TextChanged;
                 window.albumTextBox.TextChanged += AlbumTextBox_TextChanged;
                 window.imageSrcBox.TextChanged += ImageSrcBox_TextChanged;
+                window.imageThumbnailBox.Checked += ImageThumbnailBox_Checked;
                 window.imageLabelBox.TextChanged += ImageLabelBox_TextChanged;
                 window.imageExifBox.Click += ImageExifBox_Click;
                 window.imageSrcButton.Click += ImageSrcButton_Click;
@@ -161,6 +162,9 @@ namespace JonesovaGui
                 var hasImage = SelectedImage != null;
                 window.imageOrder.IsEnabled = hasImage;
                 window.imageDetails.IsEnabled = hasImage;
+                window.imageThumbnailBox.IsChecked = hasImage &&
+                    string.Equals(SelectedAlbum?.Info.Albumthumb, SelectedImage.Src, StringComparison.OrdinalIgnoreCase);
+                window.imageThumbnailBox.IsEnabled = window.imageThumbnailBox.IsChecked != true;
                 window.imageLabelBox.Text = SelectedImage?.Description;
                 window.imageExifBox.IsChecked = SelectedImage?.Exif ?? false;
                 RefreshImage();
@@ -339,6 +343,16 @@ namespace JonesovaGui
                 }
             }
 
+            private void ImageThumbnailBox_Checked(object sender, RoutedEventArgs e)
+            {
+                var oldValue = string.Equals(SelectedImage?.Src, SelectedAlbum?.Info.Albumthumb, StringComparison.OrdinalIgnoreCase);
+                if (SelectedImage != null && oldValue != window.imageThumbnailBox.IsChecked)
+                {
+                    SelectedAlbum.Info.Albumthumb = SelectedImage.Src;
+                    Changed();
+                }
+            }
+
             private void ImageLabelBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
             {
                 if (SelectedImage != null && !string.Equals(SelectedImage.Description, window.imageLabelBox.Text))
@@ -401,10 +415,23 @@ namespace JonesovaGui
                         album.Id = Slugify(album.Info.Title);
                         album.DirectoryPath = Path.Combine(contentFolder, album.Id);
                         album.IndexPath = Path.Combine(album.DirectoryPath, indexFileName);
+                        var hasThumbnail = false;
                         foreach (var image in album.Info.Resources)
                         {
+                            hasThumbnail |= string.Equals(album.Info.Albumthumb, image.Src, StringComparison.OrdinalIgnoreCase);
                             image.Src = string.IsNullOrWhiteSpace(image.Src) ? null :
                                 $"/{album.Id}/{image.Src}";
+                        }
+
+                        // Set album thumbnail if it doesn't have any (or has
+                        // invalid one).
+                        if (!hasThumbnail)
+                        {
+                            var image = album.Info.Resources.FirstOrDefault(r => r.Src != null);
+                            if (image != null)
+                            {
+                                album.Info.Albumthumb = Path.GetFileName(image.Src);
+                            }
                         }
 
                         // Save Markdown.
