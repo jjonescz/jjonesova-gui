@@ -143,6 +143,12 @@ namespace JonesovaGui
             Log.Debug("MainWindow", "Opening web");
             Process.Start(new ProcessStartInfo("https://jjonesova.cz") { UseShellExecute = true });
         }
+
+        private void Label_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            // Hidden way to open log file.
+            Process.Start(new ProcessStartInfo(Log.LogPath) { UseShellExecute = true });
+        }
     }
 
     record WindowCoordinates
