@@ -132,6 +132,9 @@ namespace JonesovaGui
                 window.albumTitleBox.Text = SelectedAlbum?.Info.Title;
                 window.albumCategoriesBox.Text = SelectedAlbum == null ? null : string.Join(", ", SelectedAlbum.Info.Categories);
                 window.albumTextBox.Text = SelectedAlbum?.Text;
+                RefreshImages();
+                window.images.IsEnabled = hasAlbum;
+                window.addImageButton.IsEnabled = hasAlbum;
             }
 
             private void AlbumUpButton_Click(object sender, RoutedEventArgs e)
@@ -259,6 +262,11 @@ namespace JonesovaGui
                     .ToList();
             }
 
+            private void RefreshImages()
+            {
+                window.images.ItemsSource = SelectedAlbum?.Info.Resources;
+            }
+
             private void Changed()
             {
                 if (!window.saveButton.IsEnabled)
@@ -314,7 +322,7 @@ namespace JonesovaGui
 
         public override string ToString()
         {
-            return Src;
+            return Path.GetFileName(Src);
         }
     }
 
