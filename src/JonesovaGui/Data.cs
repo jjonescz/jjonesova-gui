@@ -49,6 +49,7 @@ namespace JonesovaGui
                 window.imageUpButton.Click += ImageUpButton_Click;
                 window.imageDownButton.Click += ImageDownButton_Click;
                 window.albumDeleteButton.Click += AlbumDeleteButton_Click;
+                window.imageDeleteButton.Click += ImageDeleteButton_Click;
                 window.albumTitleBox.TextChanged += AlbumTitleBox_TextChanged;
                 window.albumCategoriesBox.TextChanged += AlbumCategoriesBox_TextChanged;
                 window.albumTextBox.TextChanged += AlbumTextBox_TextChanged;
@@ -235,6 +236,13 @@ namespace JonesovaGui
                 albums.Remove(SelectedAlbum);
                 Changed();
                 RefreshAlbums();
+            }
+
+            private void ImageDeleteButton_Click(object sender, RoutedEventArgs e)
+            {
+                SelectedAlbum.Info.Resources.Remove(SelectedImage);
+                Changed();
+                RefreshImages();
             }
 
             private void AlbumTitleBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
