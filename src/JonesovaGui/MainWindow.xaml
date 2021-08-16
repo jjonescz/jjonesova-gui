@@ -7,26 +7,38 @@
         mc:Ignorable="d"
         Title="jjonesova.cz" Height="450" Width="800"
         Loaded="Window_Loaded">
-    <StackPanel Orientation="Vertical">
-        <DockPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Row="0">
             <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Přihlášení</Label>
             <Label x:Name="loginStatus" DockPanel.Dock="Left" Foreground="DarkOrange">Načítání...</Label>
-            <TextBox x:Name="tokenBox" VerticalAlignment="Center" Margin="12,0" Visibility="Collapsed" TextChanged="tokenBox_TextChanged"></TextBox>
+            <TextBox x:Name="tokenBox" VerticalAlignment="Center" Margin="6,0" Visibility="Collapsed" TextChanged="tokenBox_TextChanged"></TextBox>
         </DockPanel>
-        <DockPanel>
+        <DockPanel Grid.Row="1">
             <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Náhled</Label>
             <Label x:Name="previewStatus" DockPanel.Dock="Left" Foreground="Gray">Čeká...</Label>
-            <Button x:Name="previewButton" DockPanel.Dock="Right" HorizontalAlignment="Right" Padding="12,0" Margin="12,0">Zobrazit</Button>
+            <Button x:Name="previewButton" DockPanel.Dock="Right" HorizontalAlignment="Right" Padding="12,0" Margin="6,0">Zobrazit</Button>
         </DockPanel>
-        <DockPanel>
+        <DockPanel Grid.Row="2">
             <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Kategorie</Label>
             <Label x:Name="categoriesStatus" DockPanel.Dock="Left" Foreground="Gray">Čeká...</Label>
-            <ComboBox x:Name="categories" IsEditable="True" Margin="0,0,12,0" VerticalAlignment="Center" Visibility="Collapsed"></ComboBox>
+            <ComboBox x:Name="categories" Margin="0,0,6,0" VerticalAlignment="Center" Visibility="Collapsed"></ComboBox>
         </DockPanel>
-        <DockPanel>
-            <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Album</Label>
-            <Label x:Name="albumsStatus" DockPanel.Dock="Left" Foreground="Gray">Čeká...</Label>
-            <ComboBox x:Name="albums" IsEditable="True" Margin="0,0,12,0" VerticalAlignment="Center" Visibility="Collapsed"></ComboBox>
-        </DockPanel>
-    </StackPanel>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="2*" />
+            </Grid.ColumnDefinitions>
+            <DockPanel Grid.Column="0">
+                <Label DockPanel.Dock="Top" FontWeight="Bold">Album</Label>
+                <Label x:Name="albumsStatus" DockPanel.Dock="Top" Foreground="Gray">Čeká...</Label>
+                <ListBox x:Name="albums" Margin="6,0,0,6" Visibility="Collapsed"></ListBox>
+            </DockPanel>
+        </Grid>
+    </Grid>
 </Window>
