@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -69,8 +70,6 @@ namespace JonesovaGui
                 window.loginStatus.Content = "Přihlášení úspěšné";
                 window.loginStatus.Foreground = Brushes.Black;
                 window.tokenBox.Visibility = Visibility.Collapsed;
-
-                RefreshStatus();
             }
 
             private async Task<bool> PullAsync()
@@ -233,10 +232,43 @@ namespace JonesovaGui
                     window.publishButton.IsEnabled = pushDirty;
                 }
 
-                Log.Debug("Git", $"Status: {status}; " +
+                // HACK: Get string representation of repository status.
+                var statusString = status.GetType()
+                    .GetProperty("DebuggerDisplay",
+                        BindingFlags.NonPublic | BindingFlags.Instance)
+                    .GetValue(status);
+
+                Log.Debug("Git", $"Status: {statusString}; " +
                     $"dirty: {status.IsDirty}; " +
                     $"ahead by {repo.Head.TrackingDetails.AheadBy}; " +
                     $"behind by {repo.Head.TrackingDetails.BehindBy}");
+
+                // Indicate changed files in UI.
+                foreach (var album in window.data.Albums)
+                {
+                    album.Changed = false;
+                    foreach (var image in album.Info.Resources)
+                        image.Changed = false;
+                }
+                var anyChanged = false;
+                foreach (var entry in status)
+                {
+                    var fullPath = Path.GetFullPath(entry.FilePath, basePath: window.repoPath);
+                    foreach (var album in window.data.Albums)
+                    {
+                        anyChanged |= album.Changed |= fullPath.Equals(album.IndexPath, StringComparison.OrdinalIgnoreCase);
+
+                        foreach (var image in album.Info.Resources)
+                        {
+                            anyChanged |= image.Changed |= fullPath.Equals(image.FullPath, StringComparison.OrdinalIgnoreCase);
+                        }
+                    }
+                }
+                if (anyChanged)
+                {
+                    window.albums.Items.Refresh();
+                    window.images.Items.Refresh();
+                }
             }
         }
     }

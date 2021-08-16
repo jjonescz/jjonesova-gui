@@ -74,6 +74,10 @@ namespace JonesovaGui
             // Load content.
             data.Load();
 
+            // Refresh Git status (depends on `data` being loaded, so that it
+            // can indicate changed albums and images).
+            git.RefreshStatus();
+
             // Detect deployment status.
             deploy.Detect();
         }

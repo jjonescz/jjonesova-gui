@@ -73,6 +73,7 @@ namespace JonesovaGui
 
             private Album SelectedAlbum => window.albums.SelectedItem as Album;
             private Image SelectedImage => window.images.SelectedItem as Image;
+            public IReadOnlyList<Album> Albums => albums;
 
             public void Load()
             {
@@ -613,10 +614,11 @@ namespace JonesovaGui
         public string IndexPath { get; set; }
         public AlbumInfo Info { get; set; }
         public string Text { get; set; }
+        public bool Changed { get; set; }
 
         public override string ToString()
         {
-            return Info?.Title;
+            return Info?.Title + (Changed ? " *" : null);
         }
     }
 
@@ -637,10 +639,12 @@ namespace JonesovaGui
         public string Phototitle { get; set; }
         public string Description { get; set; }
         public bool Exif { get; set; }
+        [YamlIgnore]
+        public bool Changed { get; set; }
 
         public override string ToString()
         {
-            return Src == null ? Description : Path.GetFileName(Src);
+            return (Src == null ? Description : Path.GetFileName(Src)) + (Changed ? " *" : null);
         }
     }
 
