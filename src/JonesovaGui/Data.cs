@@ -161,6 +161,7 @@ namespace JonesovaGui
                 }
 
                 window.saveButton.IsEnabled = false;
+                window.saveButton.Content = "✔ Uloženo";
             }
 
             private void RefreshAlbums()
@@ -183,6 +184,7 @@ namespace JonesovaGui
             private void Changed()
             {
                 window.saveButton.IsEnabled = true;
+                window.saveButton.Content = "Uložit";
             }
         }
     }
