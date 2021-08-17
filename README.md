@@ -23,3 +23,8 @@ Tooltips in the UI itself document some functionality.
    JonesovaGui.application
    setup.exe
    ```
+
+## Installing
+
+When upgrading, ensure you are installing from the same folder, otherwise
+ClickOnce will complain.
