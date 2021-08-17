@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -78,6 +77,25 @@ namespace JonesovaGui
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            // If there was an error previously, suggest resetting Git repo.
+            if (File.Exists(Log.ErrorStampPath))
+            {
+                File.Delete(Log.ErrorStampPath);
+                var result = MessageBox.Show(this,
+                    "V předchozím běhu nastala chyba. " +
+                    "Chcete zahodit změny provedené od předchozí zálohy (nebo zveřejnění)? " +
+                    "(To může chybu spravit pokud se stala kvůli nějaké špatné úpravě.)",
+                    "jjonesova.cz",
+                    MessageBoxButton.OKCancel,
+                    MessageBoxImage.Question,
+                    MessageBoxResult.Cancel);
+                if (result == MessageBoxResult.OK)
+                {
+                    git.Init();
+                    git.Reset(bare: true);
+                }
+            }
+
             // Load Git token.
             if (File.Exists(tokenPath))
                 tokenBox.Text = File.ReadAllText(tokenPath);

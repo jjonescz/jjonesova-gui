@@ -51,6 +51,11 @@ namespace JonesovaGui
                 }
             }
 
+            public void Init()
+            {
+                repo = new Repository(window.repoPath);
+            }
+
             private async Task<bool> TryUpdateAsync()
             {
                 if (string.IsNullOrWhiteSpace(window.tokenBox.Text)) return false;
@@ -71,14 +76,14 @@ namespace JonesovaGui
                             OnCheckoutProgress = (p, c, t) => Status("Přihlašování", $"Rozbalování: {(double)c / t:p}"),
                             RecurseSubmodules = true
                         }));
-                        repo = new Repository(window.repoPath);
+                        Init();
                         Log.Info("Git", $"Cloned at {window.repoPath}");
                     }
                     else
                     {
                         // Pull repository.
                         Log.Info("Git", $"Repo at {window.repoPath} valid; will pull");
-                        repo = new Repository(window.repoPath);
+                        Init();
                         if (!await PullAsync()) return false;
                     }
                 }
@@ -170,6 +175,35 @@ namespace JonesovaGui
                 return new Signature("Admin GUI", "admin@jjonesova.cz", DateTimeOffset.Now);
             }
 
+            public void Reset(bool bare = false)
+            {
+                var status = repo.RetrieveStatus();
+                var changes = status.Except(status.Ignored).Count();
+                var result = MessageBox.Show(window,
+                    $"Změny v {changes} souborech od předchozí zálohy (nebo předchozího zveřejnění) budou zahozeny.",
+                    "Obnovit předchozí zálohu",
+                    MessageBoxButton.OKCancel,
+                    MessageBoxImage.Warning,
+                    MessageBoxResult.Cancel);
+                if (result == MessageBoxResult.OK)
+                {
+                    Log.Info("Git", $"Resetting repository ({changes} changes)");
+                    repo.Reset(ResetMode.Hard);
+                    repo.RemoveUntrackedFiles();
+                    Log.Debug("Git", $"Repository at commit {repo.Head.Tip.Sha}");
+
+                    // Avoid updating UI when resetting the repository before
+                    // app is completely loaded (i.e., after error occurred
+                    // previously).
+                    if (!bare)
+                    {
+                        RefreshStatus();
+                        window.restoreButton.Content = "✔ Obnoveno";
+                        window.data.Load();
+                    }
+                }
+            }
+
             private void LoginButton_Click(object sender, RoutedEventArgs e)
             {
                 _ = UpdateAsync();
@@ -188,24 +222,7 @@ namespace JonesovaGui
 
             private void RestoreButton_Click(object sender, RoutedEventArgs e)
             {
-                var status = repo.RetrieveStatus();
-                var changes = status.Except(status.Ignored).Count();
-                var result = MessageBox.Show(window,
-                    $"Změny v {changes} souborech od předchozí zálohy (nebo předchozího publikování) budou zahozeny.",
-                    "Obnovit předchozí zálohu",
-                    MessageBoxButton.OKCancel,
-                    MessageBoxImage.Warning,
-                    MessageBoxResult.Cancel);
-                if (result == MessageBoxResult.OK)
-                {
-                    Log.Info("Git", $"Resetting repository ({changes} changes)");
-                    repo.Reset(ResetMode.Hard);
-                    repo.RemoveUntrackedFiles();
-                    Log.Debug("Git", $"Repository at commit {repo.Head.Tip.Sha}");
-                    RefreshStatus();
-                    window.restoreButton.Content = "✔ Obnoveno";
-                    window.data.Load();
-                }
+                Reset();
             }
 
             private async void PublishButton_Click(object sender, RoutedEventArgs e)

@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Windows;
 
 namespace JonesovaGui
@@ -11,6 +13,13 @@ namespace JonesovaGui
         private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
             Log.Error("App", e.Exception.ToString());
+
+            // Mark that we had an error.
+            try
+            {
+                File.WriteAllText(Log.ErrorStampPath, DateTime.UtcNow.ToString("O"));
+            }
+            catch { }
 
             // Open log file.
             MessageBox.Show(
