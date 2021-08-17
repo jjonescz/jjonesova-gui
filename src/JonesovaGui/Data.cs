@@ -218,6 +218,13 @@ namespace JonesovaGui
                 // Select it.
                 RefreshImages();
                 window.images.SelectedItem = image;
+
+                // First: browse for new image.
+                ImageSrcButton_Click(this, null);
+
+                // Second: edit label (focus its text box).
+                window.imageLabelBox.Focus();
+                window.imageLabelBox.SelectAll();
             }
 
             private void AlbumUpButton_Click(object sender, RoutedEventArgs e)
