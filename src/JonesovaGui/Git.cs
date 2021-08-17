@@ -13,6 +13,7 @@ namespace JonesovaGui
     {
         class Git
         {
+            private readonly string configPath;
             private readonly MainWindow window;
             private Repository repo;
             private bool pushing;
@@ -23,6 +24,19 @@ namespace JonesovaGui
 
                 GlobalSettings.LogConfiguration = new LogConfiguration(LogLevel.Trace,
                     (level, message) => Log.Write(level, "Git", message));
+
+                // Set configuration. We create separate file instead of storing
+                // it in `.git/config` so that it takes effect even when pulling
+                // the repository for the first time.
+                configPath = Path.Combine(Log.RootPath, ".gitconfig");
+                File.WriteAllText(configPath, null); // Create the file.
+                using (var config = Configuration.BuildFrom(configPath))
+                {
+                    config.Set("core.symlinks", false);
+                    config.Set("core.autocrlf", true);
+                    config.Set("core.longpaths", true);
+                }
+                GlobalSettings.SetConfigSearchPaths(ConfigurationLevel.Global, Log.RootPath);
 
                 window.loginButton.Click += LoginButton_Click;
                 window.backupButton.Click += BackupButton_Click;
