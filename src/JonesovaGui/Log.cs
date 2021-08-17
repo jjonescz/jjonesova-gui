@@ -7,7 +7,8 @@ namespace JonesovaGui
 {
     static class Log
     {
-        public static readonly string RootPath = Path.GetFullPath("jjonesova.cz");
+        public static readonly string RootPath = Path.GetFullPath("jjonesova.cz",
+            basePath: Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
         public static readonly string LogsDirectoryPath = Path.Combine(RootPath, "logs");
         public static readonly string LogPath = Path.Combine(LogsDirectoryPath, $"{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss-fffffff}.txt");
         public static readonly string ErrorStampPath = Path.Combine(RootPath, "error.stamp");
