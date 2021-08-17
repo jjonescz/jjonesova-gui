@@ -127,6 +127,12 @@ namespace JonesovaGui
                 window.categories.ItemsSource = categories;
                 window.categories.IsEnabled = true;
 
+                // Select first category if none is selected (to show user some
+                // data, so she knows she can start interacting with the
+                // program).
+                if (window.categories.SelectedIndex < 0)
+                    window.categories.SelectedIndex = 0;
+
                 // Refresh data all the way down.
                 Categories_SelectionChanged(this, null);
 
