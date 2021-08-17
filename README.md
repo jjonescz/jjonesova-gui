@@ -12,7 +12,7 @@ Tooltips in the UI itself document some functionality.
 
 1. Clear `src/JonesovaGui/bin/publish/` folder.
 2. In Visual Studio, click Publish and use already-created ClickOnce profile.
-3. Deploy contents of `src/JonesovaGui/bin/publish/` to
-   `https://jjonesova-admin.netlify.app/`.
+3. Deploy contents of `src/JonesovaGui/bin/publish/` to branch `gh-pages` and
+   push it.
 4. Commit updated ClickOnce profile (it is keeping track of app version).
-5. Look at <https://jjonesova-admin.netlify.app/publish.html>.
+5. Look at <https://jjonescz.github.io/jjonesova-gui/Publish.html>.
