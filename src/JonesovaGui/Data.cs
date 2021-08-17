@@ -429,11 +429,29 @@ namespace JonesovaGui
                         album.DirectoryPath = Path.Combine(contentFolder, album.Id);
                         album.IndexPath = Path.Combine(album.DirectoryPath, indexFileName);
                         var hasThumbnail = false;
+                        var existingNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                         foreach (var image in album.Info.Resources)
                         {
                             hasThumbnail |= string.Equals(album.Info.Albumthumb, image.Src, StringComparison.OrdinalIgnoreCase);
-                            image.Src = string.IsNullOrWhiteSpace(image.Src) ? null :
-                                $"/{album.Id}/{image.Src}";
+
+                            if (!string.IsNullOrWhiteSpace(image.Src))
+                            {
+                                // Find unused file name.
+                                var number = 1;
+                                string name;
+                                while (true)
+                                {
+                                    var bareName = Path.GetFileNameWithoutExtension(image.Src);
+                                    var extension = Path.GetExtension(image.Src);
+                                    name = GetName(bareName, number++, "_") + extension;
+                                    if (existingNames.Add(name)) break;
+                                }
+                                image.Src = $"/{album.Id}/{name}";
+                            }
+                            else
+                            {
+                                image.Src = null;
+                            }
                         }
 
                         // Set album thumbnail if it doesn't have any (or has
@@ -466,28 +484,23 @@ namespace JonesovaGui
                     var anyCopied = false;
                     foreach (var album in albums)
                     {
-                        var existingNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                        foreach (var image in album.Info.Resources)
+                        // Copy images in reverse order, so that duplicate
+                        // images are not overwritten. For example, if user
+                        // specifies two images with the same name `img.jpg`,
+                        // they get renamed as e.g., `original.jpg` to `img.jpg`
+                        // and `img.jpg` to `img_2.jpg` in the previous step.
+                        // Clearly, `img.jpg` needs to be copied first as
+                        // `img_2.jpg`, then `original.jpg` to `img.jpg`.
+                        foreach (var image in album.Info.Resources.Reverse())
                         {
-                            if (string.IsNullOrEmpty(image.Src))
+                            if (image.Src == null)
                             {
                                 image.FullPath = null;
                                 continue;
                             }
 
-                            // Find unused file name.
-                            var number = 1;
-                            string name;
-                            while (true)
-                            {
-                                var bareName = Path.GetFileNameWithoutExtension(image.Src);
-                                var extension = Path.GetExtension(image.Src);
-                                name = GetName(bareName, number++, "_") + extension;
-                                if (existingNames.Add(name)) break;
-                            }
-
                             // Copy image if not the same as previously.
-                            var fullPath = Path.Combine(assetsFolder, album.Id, name);
+                            var fullPath = Path.GetFullPath($"./{image.Src}", basePath: assetsFolder);
                             if (!fullPath.Equals(image.FullPath))
                             {
                                 // Report status (if the first time copying).
