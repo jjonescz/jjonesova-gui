@@ -78,7 +78,6 @@ namespace JonesovaGui
                         address = match.Groups[1].Value;
                         if (!string.Equals(address, oldAddress))
                         {
-                            OpenPreview();
                             _ = window.Dispatcher.InvokeAsync(() =>
                             {
                                 window.previewStatus.Content = $"Načteno ({address})";
