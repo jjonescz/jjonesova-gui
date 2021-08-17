@@ -67,7 +67,7 @@ namespace JonesovaGui
                         {
                             CredentialsProvider = Credentials,
                             OnProgress = p => Status("Přihlašování", p),
-                            OnTransferProgress = p => Status("Přihlašování", p),
+                            OnTransferProgress = p => Status("Přihlašování", "Stahování", p),
                             OnCheckoutProgress = (p, c, t) => Status("Přihlašování", $"Rozbalování: {(double)c / t:p}"),
                             RecurseSubmodules = true
                         }));
@@ -100,7 +100,7 @@ namespace JonesovaGui
                     {
                         CredentialsProvider = Credentials,
                         OnProgress = p => Status("Přihlašování", p),
-                        OnTransferProgress = p => Status("Přihlašování", p)
+                        OnTransferProgress = p => Status("Přihlašování", "Stahování", p)
                     }
                 }));
                 if (result.Status == MergeStatus.Conflicts)
@@ -151,9 +151,9 @@ namespace JonesovaGui
                 return true;
             }
 
-            private bool Status(string title, TransferProgress p)
+            private bool Status(string title, string subtitle, TransferProgress p)
             {
-                return Status(title, $"Přenos: {(double)p.ReceivedObjects / p.TotalObjects:p}");
+                return Status(title, $"{subtitle}: {(double)p.ReceivedObjects / p.TotalObjects:p}");
             }
 
             private Credentials Credentials(string url, string usernameFromUrl, SupportedCredentialTypes types)
