@@ -11,21 +11,18 @@ Tooltips in the UI itself document some functionality.
 ## Release process
 
 1. Clear `src/JonesovaGui/bin/publish/` folder.
-2. In Visual Studio, click Publish and use already-created ClickOnce profile.
-3. Commit updated ClickOnce profile (it is keeping track of total build count)
+2. Bump version.
+3. In Visual Studio, click Publish and use already-created ClickOnce profile.
+4. Commit updated ClickOnce profile (it is keeping track of total build count)
    except `<History>` tag.
-4. Remove all files from `src/JonesovaGui/bin/publish/` except the following:
+5. Remove all files from `src/JonesovaGui/bin/publish/` except the following:
 
    ```txt
    Application Files/
    JonesovaGui.application
    ```
 
-5. Upload the directory to branch `gh-pages`.
-6. Point people to
-   <https://jjonescz.gihub.io/jjonesova-gui/JonesovaGui.application>.
-
-## Installing
-
-When upgrading, ensure you are installing from the same folder, otherwise
-ClickOnce will complain.
+6. Upload the directory to branch `gh-pages`.
+7. Publish new release on GitHub (look at the older ones for guidelines).
+8. Point people to
+   <https://jjonescz.github.io/jjonesova-gui/JonesovaGui.application>.
