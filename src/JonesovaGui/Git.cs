@@ -24,13 +24,37 @@ namespace JonesovaGui
                 GlobalSettings.LogConfiguration = new LogConfiguration(LogLevel.Trace,
                     (level, message) => Log.Write(level, "Git", message));
 
+                window.loginButton.Click += LoginButton_Click;
                 window.backupButton.Click += BackupButton_Click;
                 window.restoreButton.Click += RestoreButton_Click;
                 window.publishButton.Click += PublishButton_Click;
             }
 
-            public async Task<bool> UpdateAsync()
+            public async Task UpdateAsync()
             {
+                window.loginStatus.Content = "Přihlašování...";
+                window.loginStatus.Foreground = Brushes.DarkOrange;
+                window.tokenBox.Visibility = Visibility.Collapsed;
+                window.loginButton.Visibility = Visibility.Collapsed;
+                if (await TryUpdateAsync())
+                {
+                    window.loginStatus.Content = "Přihlášení úspěšné";
+                    window.loginStatus.Foreground = Brushes.Black;
+                    window.Init();
+                }
+                else
+                {
+                    window.loginStatus.Content = "Chyba; zadejte klíč:";
+                    window.loginStatus.Foreground = Brushes.DarkRed;
+                    window.tokenBox.Visibility = Visibility.Visible;
+                    window.loginButton.Visibility = Visibility.Visible;
+                }
+            }
+
+            private async Task<bool> TryUpdateAsync()
+            {
+                if (string.IsNullOrWhiteSpace(window.tokenBox.Text)) return false;
+
                 Directory.CreateDirectory(window.repoPath);
                 try
                 {
@@ -61,15 +85,9 @@ namespace JonesovaGui
                 catch (LibGit2SharpException e)
                 {
                     Log.Error("Git", $"Update failed: {e}");
-                    window.loginStatus.Content = "Chyba; zadejte kód:";
-                    window.loginStatus.Foreground = Brushes.DarkRed;
-                    window.tokenBox.Visibility = Visibility.Visible;
                     return false;
                 }
 
-                window.loginStatus.Content = "Přihlášení úspěšné";
-                window.loginStatus.Foreground = Brushes.Black;
-                window.tokenBox.Visibility = Visibility.Collapsed;
                 return true;
             }
 
@@ -150,6 +168,11 @@ namespace JonesovaGui
             private Signature GetSignature()
             {
                 return new Signature("Admin GUI", "admin@jjonesova.cz", DateTimeOffset.Now);
+            }
+
+            private void LoginButton_Click(object sender, RoutedEventArgs e)
+            {
+                _ = UpdateAsync();
             }
 
             // WARNING: This is called also before publishing, so it must not be `async`!

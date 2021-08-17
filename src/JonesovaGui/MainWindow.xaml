@@ -18,6 +18,8 @@
         <DockPanel Grid.Row="0">
             <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold" MouseDoubleClick="Label_MouseDoubleClick">Přihlášení</Label>
             <Label x:Name="loginStatus" DockPanel.Dock="Left" Foreground="DarkOrange">Načítání...</Label>
+            <Button x:Name="loginButton" DockPanel.Dock="Right" Visibility="Collapsed" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="12,0" Margin="6,0"
+                    ToolTip="git pull || git clone">Přihlásit</Button>
             <TextBox x:Name="tokenBox" VerticalAlignment="Center" Margin="6,0" Visibility="Collapsed" TextChanged="tokenBox_TextChanged"
                      ToolTip="GitHub personal access token (with scope `repo`)"></TextBox>
         </DockPanel>

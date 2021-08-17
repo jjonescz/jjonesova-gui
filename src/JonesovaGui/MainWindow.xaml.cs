@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -28,6 +29,22 @@ namespace JonesovaGui
             git = new Git(this);
             data = new Data(this);
             deploy = new Deploy(this);
+        }
+
+        public void Init()
+        {
+            // Execute Hugo.
+            new Hugo(this).Start();
+
+            // Load content.
+            data.Load();
+
+            // Refresh Git status (depends on `data` being loaded, so that it
+            // can indicate changed albums and images).
+            git.RefreshStatus();
+
+            // Detect deployment status.
+            deploy.Detect();
         }
 
         private void Window_SourceInitialized(object sender, EventArgs e)
@@ -59,28 +76,15 @@ namespace JonesovaGui
             }
         }
 
-        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             // Load Git token.
             if (File.Exists(tokenPath))
                 tokenBox.Text = File.ReadAllText(tokenPath);
 
-            // Update Git repo.
-            if (!await git.UpdateAsync())
-                return;
-
-            // Execute Hugo.
-            new Hugo(this).Start();
-
-            // Load content.
-            data.Load();
-
-            // Refresh Git status (depends on `data` being loaded, so that it
-            // can indicate changed albums and images).
-            git.RefreshStatus();
-
-            // Detect deployment status.
-            deploy.Detect();
+            // Update Git repo. `MainWindow.Init` will be called then by `Git`
+            // when login succeeds.
+            _ = git.UpdateAsync();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
