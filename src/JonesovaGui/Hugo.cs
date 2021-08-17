@@ -46,6 +46,7 @@ namespace JonesovaGui
                 {
                     window.previewStatus.Content = "Načítání...";
                     window.previewStatus.Foreground = Brushes.DarkOrange;
+                    window.previewButton.IsEnabled = false;
                 });
 
                 // Kill existing hugo processes (can be there from previous
@@ -82,6 +83,7 @@ namespace JonesovaGui
                             {
                                 window.previewStatus.Content = $"Načteno ({address})";
                                 window.previewStatus.Foreground = Brushes.Black;
+                                window.previewButton.IsEnabled = true;
                             });
                         }
                         return;
