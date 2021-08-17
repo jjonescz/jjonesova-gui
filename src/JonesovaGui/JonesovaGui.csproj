@@ -13,9 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Assets\hugo.exe">
+    <Content Include="Assets\hugo.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
 
 </Project>
