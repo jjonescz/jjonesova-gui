@@ -1,5 +1,6 @@
 ﻿using LibGit2Sharp;
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -46,6 +47,14 @@ namespace JonesovaGui
 
             public async Task UpdateAsync()
             {
+                if (DesignerProperties.GetIsInDesignMode(window))
+                {
+                    window.loginStatus.Content = "Režim vývoje, přihlášení neproběhlo";
+                    window.loginStatus.Foreground = Brushes.Purple;
+                    window.tokenBox.Visibility = Visibility.Collapsed;
+                    window.loginButton.Visibility = Visibility.Collapsed;
+                }
+
                 window.loginStatus.Content = "Přihlašování...";
                 window.loginStatus.Foreground = Brushes.DarkOrange;
                 window.tokenBox.Visibility = Visibility.Collapsed;
