@@ -9,6 +9,7 @@ internal class Program
     {
         var tagName = GetProcessOutput("git", "describe --tags").TrimEnd();
         Console.WriteLine($"Tag: '{tagName}'");
+        Console.WriteLine($"Working directory: '{Environment.CurrentDirectory}'");
     }
 
     static string GetProcessOutput(string fileName, string arguments)
