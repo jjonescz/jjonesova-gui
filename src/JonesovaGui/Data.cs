@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -597,22 +598,34 @@ namespace JonesovaGui
                 window.imageOpenButton.IsEnabled = fullPath != null;
                 if (fullPath != null)
                 {
+                    window.imageStatus.Content = "Načítání...";
+                    window.imageStatus.Foreground = Brushes.Gray;
                     window.imageStatus.Visibility = Visibility.Visible;
                     var uri = new Uri(fullPath, UriKind.Absolute);
                     var exif = SelectedImage.Exif;
-                    var bitmap = await Task.Run(() =>
+                    BitmapImage bitmap;
+                    try
                     {
-                        var image = new BitmapImage();
-                        image.BeginInit();
-                        image.UriSource = uri;
-                        // Caching is required, so that the image can be moved
-                        // even when displayed.
-                        image.CacheOption = BitmapCacheOption.OnLoad;
-                        if (exif) image.Rotation = DetectRotation(fullPath);
-                        image.EndInit();
-                        image.Freeze();
-                        return image;
-                    });
+                        bitmap = await Task.Run(() =>
+                        {
+                            var image = new BitmapImage();
+                            image.BeginInit();
+                            image.UriSource = uri;
+                            // Caching is required, so that the image can be moved
+                            // even when displayed.
+                            image.CacheOption = BitmapCacheOption.OnLoad;
+                            if (exif) image.Rotation = DetectRotation(fullPath);
+                            image.EndInit();
+                            image.Freeze();
+                            return image;
+                        });
+                    }
+                    catch
+                    {
+                        window.imageStatus.Content = "Chyba načítání obrázku";
+                        window.imageStatus.Foreground = Brushes.DarkRed;
+                        return;
+                    }
                     _ = window.Dispatcher.InvokeAsync(() =>
                     {
                         window.imageStatus.Visibility = Visibility.Collapsed;
