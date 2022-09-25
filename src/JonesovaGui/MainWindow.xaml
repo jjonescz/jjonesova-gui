@@ -8,149 +8,149 @@
         Title="jjonesova.cz" Height="500" Width="800"
         Loaded="Window_Loaded" Closing="Window_Closing" SourceInitialized="Window_SourceInitialized">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <DockPanel Grid.Row="0">
-            <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold" MouseDoubleClick="Label_MouseDoubleClick">Přihlášení</Label>
-            <Label x:Name="loginStatus" DockPanel.Dock="Left" Foreground="DarkOrange">Načítání...</Label>
-            <Button x:Name="loginButton" DockPanel.Dock="Right" Visibility="Collapsed" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="12,0" Margin="6,0"
-                    ToolTip="git pull || git clone">Přihlásit</Button>
-            <TextBox x:Name="tokenBox" VerticalAlignment="Center" Margin="6,0" Visibility="Collapsed" TextChanged="tokenBox_TextChanged"
-                     ToolTip="GitHub personal access token (with scope `repo`)"></TextBox>
-        </DockPanel>
-        <DockPanel Grid.Row="1">
-            <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold" ToolTip="Hugo">Náhled</Label>
-            <Button x:Name="previewButton" DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="12,0" Margin="6,0"
-                    ToolTip="hugo --gc server" IsEnabled="False">Zobrazit náhled</Button>
-            <Label x:Name="previewStatus" Foreground="Gray">Čeká...</Label>
-        </DockPanel>
-        <DockPanel Grid.Row="2">
-            <Label Margin="0,0,6,0" FontWeight="Bold">Změny</Label>
-            <Button x:Name="saveButton" Padding="12,0" Margin="6,0" IsEnabled="False" ContextMenuService.ShowOnDisabled="True">
-                Uložit
-                <Button.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem x:Name="backupButton" IsEnabled="False" ToolTip="git commit" Header="Zálohovat" />
-                        <MenuItem x:Name="restoreButton" IsEnabled="False" ToolTip="git reset --hard" Header="Obnovit předchozí zálohu" />
-                    </ContextMenu>
-                </Button.ContextMenu>
-            </Button>
-            <Button x:Name="publishButton" Padding="12,0" Margin="6,0" IsEnabled="False" ToolTip="git pull &amp;&amp; git push">Zveřejnit</Button>
-            <Label x:Name="deployStatus" Foreground="Gray" ToolTip="Netlify status badge">Čeká...</Label>
-            <Button x:Name="webButton" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="12,0" Margin="6,0"
-                    ToolTip="https://jjonesova.cz" Click="webButton_Click">Zobrazit web</Button>
-        </DockPanel>
-        <DockPanel Grid.Row="3" Margin="0,6,0,0">
-            <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Kategorie</Label>
-            <ComboBox x:Name="categories" Margin="0,0,6,0" VerticalAlignment="Center" IsEnabled="False"></ComboBox>
-        </DockPanel>
-        <Grid Grid.Row="4">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition x:Name="albumsColumn" Width="1*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition x:Name="albumDetailColumn" Width="2*" />
-            </Grid.ColumnDefinitions>
-            <DockPanel Grid.Column="0" Margin="0,6,0,0">
-                <StackPanel DockPanel.Dock="Top" Margin="0,0,0,6" Orientation="Horizontal">
-                    <Label Margin="0,0,6,0" FontWeight="Bold">Album</Label>
-                    <Button x:Name="addAlbumButton" Padding="12,0" IsEnabled="False">Přidat nové</Button>
-                </StackPanel>
-                <StackPanel x:Name="albumOrder" DockPanel.Dock="Bottom" Margin="0,0,0,6" Orientation="Horizontal" VerticalAlignment="Top" IsEnabled="False">
-                    <Label Margin="0,0,6,0" FontWeight="Bold">Posunout</Label>
-                    <Button Margin="0,0,6,0" x:Name="albumUpButton" Padding="12,0">⬆</Button>
-                    <Button Margin="0,0,6,0" x:Name="albumDownButton" Padding="12,0">⬇</Button>
-                    <Button x:Name="albumDeleteButton" Padding="12,0">Smazat</Button>
-                </StackPanel>
-                <ListBox x:Name="albums" Margin="6,0,6,6" IsEnabled="False"></ListBox>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <DockPanel Grid.Row="0">
+                <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold" MouseDoubleClick="Label_MouseDoubleClick">Přihlášení</Label>
+                <Label x:Name="loginStatus" DockPanel.Dock="Left" Foreground="DarkOrange">Načítání...</Label>
+                <Button x:Name="loginButton" DockPanel.Dock="Right" Visibility="Collapsed" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="12,0" Margin="6,0"
+                        ToolTip="git pull || git clone">Přihlásit</Button>
+                <TextBox x:Name="tokenBox" VerticalAlignment="Center" Margin="6,0" Visibility="Collapsed" TextChanged="tokenBox_TextChanged"
+                         ToolTip="GitHub personal access token (with scope `repo`)"></TextBox>
             </DockPanel>
-            <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="4" ShowsPreview="True" />
-            <Grid x:Name="albumDetails" Grid.Column="2" Margin="0,6,0,0" IsEnabled="False">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <DockPanel Grid.Row="0">
-                    <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Titulek</Label>
-                    <TextBox x:Name="albumTitleBox" VerticalAlignment="Center" Margin="6,0"></TextBox>
+            <DockPanel Grid.Row="1">
+                <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold" ToolTip="Hugo">Náhled</Label>
+                <Button x:Name="previewButton" DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="12,0" Margin="6,0"
+                        ToolTip="hugo --gc server" IsEnabled="False">Zobrazit náhled</Button>
+                <Label x:Name="previewStatus" Foreground="Gray">Čeká...</Label>
+            </DockPanel>
+            <DockPanel Grid.Row="2">
+                <Label Margin="0,0,6,0" FontWeight="Bold">Změny</Label>
+                <Button x:Name="saveButton" Padding="12,0" Margin="6,0" IsEnabled="False" ContextMenuService.ShowOnDisabled="True">
+                    Uložit
+                    <Button.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem x:Name="backupButton" IsEnabled="False" ToolTip="git commit" Header="Zálohovat" />
+                            <MenuItem x:Name="restoreButton" IsEnabled="False" ToolTip="git reset --hard" Header="Obnovit předchozí zálohu" />
+                        </ContextMenu>
+                    </Button.ContextMenu>
+                </Button>
+                <Button x:Name="publishButton" Padding="12,0" Margin="6,0" IsEnabled="False" ToolTip="git pull &amp;&amp; git push">Zveřejnit</Button>
+                <Label x:Name="deployStatus" Foreground="Gray" ToolTip="Netlify status badge">Čeká...</Label>
+                <Button x:Name="webButton" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="12,0" Margin="6,0"
+                        ToolTip="https://jjonesova.cz" Click="webButton_Click">Zobrazit web</Button>
+            </DockPanel>
+            <DockPanel Grid.Row="3" Margin="0,6,0,0">
+                <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Kategorie</Label>
+                <ComboBox x:Name="categories" Margin="0,0,6,0" VerticalAlignment="Center" IsEnabled="False"></ComboBox>
+            </DockPanel>
+            <Grid Grid.Row="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition x:Name="albumsColumn" Width="1*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition x:Name="albumDetailColumn" Width="2*" />
+                </Grid.ColumnDefinitions>
+                <DockPanel Grid.Column="0" Margin="0,6,0,0">
+                    <StackPanel DockPanel.Dock="Top" Margin="0,0,0,6" Orientation="Horizontal">
+                        <Label Margin="0,0,6,0" FontWeight="Bold">Album</Label>
+                        <Button x:Name="addAlbumButton" Padding="12,0" IsEnabled="False">Přidat nové</Button>
+                    </StackPanel>
+                    <StackPanel x:Name="albumOrder" DockPanel.Dock="Bottom" Margin="0,0,0,6" Orientation="Horizontal" VerticalAlignment="Top" IsEnabled="False">
+                        <Label Margin="0,0,6,0" FontWeight="Bold">Posunout</Label>
+                        <Button Margin="0,0,6,0" x:Name="albumUpButton" Padding="12,0">⬆</Button>
+                        <Button Margin="0,0,6,0" x:Name="albumDownButton" Padding="12,0">⬇</Button>
+                        <Button x:Name="albumDeleteButton" Padding="12,0">Smazat</Button>
+                    </StackPanel>
+                    <ListBox x:Name="albums" Margin="6,0,6,6" IsEnabled="False"></ListBox>
                 </DockPanel>
-                <DockPanel Grid.Row="1">
-                    <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Kategorie</Label>
-                    <TextBox x:Name="albumCategoriesBox" VerticalAlignment="Center" Margin="6,0" ToolTip="Názvy oddělené čárkou"></TextBox>
-                </DockPanel>
-                <DockPanel Grid.Row="2">
-                    <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Text</Label>
-                    <TextBox x:Name="albumTextBox" VerticalAlignment="Center" Margin="6,0" AcceptsReturn="True" TextWrapping="Wrap"></TextBox>
-                </DockPanel>
-                <Grid Grid.Row="3">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition x:Name="imagesColumn" Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition x:Name="imageDetailColumn" Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <DockPanel Grid.Column="0" Margin="0,6,0,0">
-                        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,6" Orientation="Horizontal">
-                            <Label Margin="0,0,6,0" FontWeight="Bold">Obrázky</Label>
-                            <Button x:Name="addImageButton" Padding="12,0" IsEnabled="False">Přidat nový</Button>
-                        </StackPanel>
-                        <StackPanel x:Name="imageOrder" DockPanel.Dock="Bottom" Margin="0,0,0,6" Orientation="Horizontal" VerticalAlignment="Top" IsEnabled="False">
-                            <Label Margin="0,0,6,0" FontWeight="Bold">Posunout</Label>
-                            <Button Margin="0,0,6,0" x:Name="imageUpButton" Padding="12,0">⬆</Button>
-                            <Button Margin="0,0,6,0" x:Name="imageDownButton" Padding="12,0">⬇</Button>
-                            <Button x:Name="imageDeleteButton" Padding="12,0">Smazat</Button>
-                        </StackPanel>
-                        <ListBox x:Name="images" Margin="6,0,6,6" IsEnabled="False"></ListBox>
+                <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="4" ShowsPreview="True" />
+                <Grid x:Name="albumDetails" Grid.Column="2" Margin="0,6,0,0" IsEnabled="False">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <DockPanel Grid.Row="0">
+                        <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Titulek</Label>
+                        <TextBox x:Name="albumTitleBox" VerticalAlignment="Center" Margin="6,0"></TextBox>
                     </DockPanel>
-                    <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="4" ShowsPreview="True" />
-                    <Grid x:Name="imageDetails" Grid.Column="2" Margin="0,6,0,0" IsEnabled="False">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-                        <DockPanel Grid.Row="0">
-                            <Label Margin="0,0,6,0" FontWeight="Bold">Obrázek</Label>
-                            <TextBox x:Name="imageSrcBox" VerticalAlignment="Center" Margin="6,0" IsEnabled="False"></TextBox>
+                    <DockPanel Grid.Row="1">
+                        <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Kategorie</Label>
+                        <TextBox x:Name="albumCategoriesBox" VerticalAlignment="Center" Margin="6,0" ToolTip="Názvy oddělené čárkou"></TextBox>
+                    </DockPanel>
+                    <DockPanel Grid.Row="2">
+                        <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Text</Label>
+                        <TextBox x:Name="albumTextBox" VerticalAlignment="Center" Margin="6,0" AcceptsReturn="True" TextWrapping="Wrap"></TextBox>
+                    </DockPanel>
+                    <Grid Grid.Row="3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition x:Name="imagesColumn" Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition x:Name="imageDetailColumn" Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <DockPanel Grid.Column="0" Margin="0,6,0,0">
+                            <StackPanel DockPanel.Dock="Top" Margin="0,0,0,6" Orientation="Horizontal">
+                                <Label Margin="0,0,6,0" FontWeight="Bold">Obrázky</Label>
+                                <Button x:Name="addImageButton" Padding="12,0" IsEnabled="False">Přidat nový</Button>
+                            </StackPanel>
+                            <StackPanel x:Name="imageOrder" DockPanel.Dock="Bottom" Margin="0,0,0,6" Orientation="Horizontal" VerticalAlignment="Top" IsEnabled="False">
+                                <Label Margin="0,0,6,0" FontWeight="Bold">Posunout</Label>
+                                <Button Margin="0,0,6,0" x:Name="imageUpButton" Padding="12,0">⬆</Button>
+                                <Button Margin="0,0,6,0" x:Name="imageDownButton" Padding="12,0">⬇</Button>
+                                <Button x:Name="imageDeleteButton" Padding="12,0">Smazat</Button>
+                            </StackPanel>
+                            <ListBox x:Name="images" Margin="6,0,6,6" IsEnabled="False"></ListBox>
                         </DockPanel>
-                        <CheckBox x:Name="imageThumbnailBox" Grid.Row="1" Margin="6,0" VerticalAlignment="Center">
-                            <Label Padding="0">Použít jako hlavní obrázek alba</Label>
-                        </CheckBox>
-                        <DockPanel Grid.Row="2">
-                            <Label Margin="0,0,6,0" FontWeight="Bold">Popisek</Label>
-                            <TextBox x:Name="imageLabelBox" VerticalAlignment="Center" Margin="6,0" AcceptsReturn="True" TextWrapping="Wrap"></TextBox>
-                        </DockPanel>
-                        <DockPanel Grid.Row="3">
-                            <Label Margin="0,0,6,0" FontWeight="Bold">Pokročilé</Label>
-                            <CheckBox x:Name="imageExifBox" Margin="6,0" VerticalAlignment="Center">
-                                <Label Padding="0">Spravit orientaci</Label>
+                        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="4" ShowsPreview="True" />
+                        <Grid x:Name="imageDetails" Grid.Column="2" Margin="0,6,0,0" IsEnabled="False">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <DockPanel Grid.Row="0">
+                                <Label Margin="0,0,6,0" FontWeight="Bold">Obrázek</Label>
+                                <TextBox x:Name="imageSrcBox" VerticalAlignment="Center" Margin="6,0" IsEnabled="False"></TextBox>
+                            </DockPanel>
+                            <CheckBox x:Name="imageThumbnailBox" Grid.Row="1" Margin="6,0" VerticalAlignment="Center">
+                                <Label Padding="0">Použít jako hlavní obrázek alba</Label>
                             </CheckBox>
-                        </DockPanel>
-                        <Grid Grid.Row="4" Margin="6,0,0,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Button x:Name="imageSrcButton" Grid.Column="0" Margin="0,0,6,0" Padding="12,2" DockPanel.Dock="Right">Změnit...</Button>
-                            <Button x:Name="imageOpenButton" Grid.Column="1" Margin="0,0,6,0" Padding="12,2" DockPanel.Dock="Right" IsEnabled="False">Otevřít</Button>
-                        </Grid>
-                        <Grid Grid.Row="5">
-                            <Label x:Name="imageStatus" Foreground="Gray" Visibility="Collapsed">Načítání...</Label>
-                            <Image x:Name="image" Margin="6"></Image>
+                            <DockPanel Grid.Row="2">
+                                <Label Margin="0,0,6,0" FontWeight="Bold">Popisek</Label>
+                                <TextBox x:Name="imageLabelBox" VerticalAlignment="Center" Margin="6,0" AcceptsReturn="True" TextWrapping="Wrap"></TextBox>
+                            </DockPanel>
+                            <DockPanel Grid.Row="3">
+                                <Label Margin="0,0,6,0" FontWeight="Bold">Pokročilé</Label>
+                                <CheckBox x:Name="imageExifBox" Margin="6,0" VerticalAlignment="Center">
+                                    <Label Padding="0">Spravit orientaci</Label>
+                                </CheckBox>
+                            </DockPanel>
+                            <Grid Grid.Row="4" Margin="6,0,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="imageSrcButton" Grid.Column="0" Margin="0,0,6,0" Padding="12,2" DockPanel.Dock="Right">Změnit...</Button>
+                                <Button x:Name="imageOpenButton" Grid.Column="1" Margin="0,0,6,0" Padding="12,2" DockPanel.Dock="Right" IsEnabled="False">Otevřít</Button>
+                            </Grid>
+                            <Grid Grid.Row="5">
+                                <Label x:Name="imageStatus" Foreground="Gray" Visibility="Collapsed">Načítání...</Label>
+                                <Image x:Name="image" Margin="6"></Image>
+                            </Grid>
                         </Grid>
                     </Grid>
                 </Grid>
             </Grid>
         </Grid>
-    </Grid>
     </ScrollViewer>
 </Window>
