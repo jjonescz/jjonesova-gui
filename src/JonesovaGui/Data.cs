@@ -389,6 +389,10 @@ namespace JonesovaGui
 
             private void ImageSrcButton_Click(object sender, RoutedEventArgs e)
             {
+                if (!string.IsNullOrEmpty(lastDir) && !Directory.Exists(lastDir))
+                {
+                    lastDir = null;
+                }
                 var dialog = new OpenFileDialog
                 {
                     InitialDirectory = lastDir ?? string.Empty
