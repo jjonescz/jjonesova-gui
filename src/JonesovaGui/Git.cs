@@ -221,7 +221,7 @@ namespace JonesovaGui
                     if (!bare)
                     {
                         RefreshStatus();
-                        window.restoreButton.Content = "✔ Obnoveno";
+                        window.restoreButton.Header = "✔ Obnoveno";
                         window.data.Load();
                     }
                 }
@@ -240,7 +240,7 @@ namespace JonesovaGui
                 var commit = repo.Commit("Apply changes from admin GUI", GetSignature(), GetSignature());
                 Log.Debug("Git", $"Committed as {commit.Sha}");
                 RefreshStatus();
-                window.backupButton.Content = "✔ Zálohováno";
+                window.backupButton.Header = "✔ Zálohováno";
             }
 
             private void RestoreButton_Click(object sender, RoutedEventArgs e)
@@ -283,12 +283,12 @@ namespace JonesovaGui
                 var dirty = status.IsDirty && !window.saveButton.IsEnabled;
                 if (dirty && !window.restoreButton.IsEnabled)
                 {
-                    window.restoreButton.Content = "Obnovit předchozí zálohu...";
+                    window.restoreButton.Header = "Obnovit předchozí zálohu...";
                 }
                 window.restoreButton.IsEnabled = dirty;
                 if (dirty && !window.backupButton.IsEnabled)
                 {
-                    window.backupButton.Content = "Zálohovat";
+                    window.backupButton.Header = "Zálohovat";
                 }
                 window.backupButton.IsEnabled = dirty;
 

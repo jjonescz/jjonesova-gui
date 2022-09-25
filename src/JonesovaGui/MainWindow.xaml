@@ -31,9 +31,15 @@
         </DockPanel>
         <DockPanel Grid.Row="2">
             <Label Margin="0,0,6,0" FontWeight="Bold">Změny</Label>
-            <Button x:Name="saveButton" Padding="12,0" Margin="6,0" IsEnabled="False">Uložit</Button>
-            <Button x:Name="backupButton" Padding="12,0" Margin="6,0" IsEnabled="False" ToolTip="git commit">Zálohovat</Button>
-            <Button x:Name="restoreButton" Padding="12,0" Margin="6,0" IsEnabled="False" ToolTip="git reset --hard">Obnovit předchozí zálohu...</Button>
+            <Button x:Name="saveButton" Padding="12,0" Margin="6,0" IsEnabled="False" ContextMenuService.ShowOnDisabled="True">
+                Uložit
+                <Button.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem x:Name="backupButton" IsEnabled="False" ToolTip="git commit" Header="Zálohovat" />
+                        <MenuItem x:Name="restoreButton" IsEnabled="False" ToolTip="git reset --hard" Header="Obnovit předchozí zálohu" />
+                    </ContextMenu>
+                </Button.ContextMenu>
+            </Button>
             <Button x:Name="publishButton" Padding="12,0" Margin="6,0" IsEnabled="False" ToolTip="git pull &amp;&amp; git push">Zveřejnit</Button>
             <Label x:Name="deployStatus" Foreground="Gray" ToolTip="Netlify status badge">Čeká...</Label>
             <Button x:Name="webButton" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="12,0" Margin="6,0"
