@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Tomlyn;
+using Tomlyn.Syntax;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -26,10 +28,12 @@ namespace JonesovaGui
             private readonly IDeserializer deserializer;
             private readonly ISerializer serializer;
             private readonly MainWindow window;
-            private readonly string contentFolder, assetsFolder, lastDirPath;
+            private readonly string contentFolder, assetsFolder, lastDirPath, configPath;
             private string lastDir;
             private List<Album> albums;
             private List<string> categories;
+            private DocumentSyntax config;
+            private KeyValueSyntax text;
 
             public Data(MainWindow window)
             {
@@ -46,6 +50,7 @@ namespace JonesovaGui
                 contentFolder = Path.Combine(window.repoPath, "content");
                 assetsFolder = Path.Combine(window.repoPath, "assets");
                 lastDirPath = Path.Combine(Log.RootPath, "last-dir.txt");
+                configPath = Path.Combine(window.repoPath, "config.toml");
 
                 if (File.Exists(lastDirPath))
                     lastDir = File.ReadAllText(lastDirPath);
@@ -108,6 +113,7 @@ namespace JonesovaGui
                     .Where(a => a != null)
                     .ToList();
                 categories = albums.SelectMany(a => a.Info.Categories).Distinct().ToList();
+                categories.Add("Kontaktní informace");
 
                 // Normalize some properties for editing (they are then again
                 // modified when saving).
@@ -124,6 +130,16 @@ namespace JonesovaGui
                         }
                     }
                 }
+                
+                // Load contact info.
+                // TODO: Better would be to traverse syntax tree to find the correct node.
+                config = Toml.Parse(File.ReadAllText(configPath), configPath);
+                var paragraph = config.Tables.OfType<TableSyntax>()
+                    .First(t => t.Name.ToString() == "params.footer.paragraph");
+                text = paragraph.Items.First(k => ((BareKeySyntax)k.Key.Key).Key.Text == "text");
+                window.contactBox.TextChanged -= ContactBox_TextChanged;
+                window.contactBox.Text = ((StringValueSyntax)text.Value).Value;
+                window.contactBox.TextChanged += ContactBox_TextChanged;
 
                 window.categories.ItemsSource = categories;
                 window.categories.IsEnabled = true;
@@ -142,13 +158,30 @@ namespace JonesovaGui
                 window.images.SelectedIndex = selectedImage;
             }
 
+            private void ContactBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+            {
+                Changed();
+            }
+
             private void Categories_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
             {
-                var category = window.categories.SelectedItem as string;
-                var hasCategory = category != null;
+                var index = window.categories.SelectedIndex;
+                var hasCategory = 0 <= index && index < categories.Count - 1;
                 RefreshAlbums();
                 window.albums.IsEnabled = hasCategory;
                 window.addAlbumButton.IsEnabled = hasCategory;
+
+                // Last category is "contact info".
+                if (index == categories.Count - 1)
+                {
+                    window.contactBox.Visibility = Visibility.Visible;
+                    window.detailsBox.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    window.contactBox.Visibility = Visibility.Collapsed;
+                    window.detailsBox.Visibility = Visibility.Visible;
+                }
             }
 
             private void Albums_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
@@ -424,8 +457,14 @@ namespace JonesovaGui
                 window.saveButton.IsEnabled = false;
                 window.saveButton.Content = "⏳ Ukládání...";
 
+                var contact = window.contactBox.Text;
+
                 await Task.Run(async () =>
                 {
+                    // Save contact info.
+                    text.Value = new StringValueSyntax(contact);
+                    File.WriteAllText(configPath, config.ToString());
+
                     // Add/update albums.
                     foreach (var album in albums)
                     {

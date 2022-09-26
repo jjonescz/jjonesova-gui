@@ -50,7 +50,8 @@
                 <Label Margin="0,0,6,0" DockPanel.Dock="Left" FontWeight="Bold">Kategorie</Label>
                 <ComboBox x:Name="categories" Margin="0,0,6,0" VerticalAlignment="Center" IsEnabled="False"></ComboBox>
             </DockPanel>
-            <Grid Grid.Row="4">
+            <TextBox x:Name="contactBox" Grid.Row="4" Visibility="Collapsed" Margin="6" AcceptsReturn="True" TextWrapping="Wrap" />
+            <Grid x:Name="detailsBox" Grid.Row="4">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition x:Name="albumsColumn" Width="1*" />
                     <ColumnDefinition Width="Auto" />
