@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "PublishTool": {
-      "commandName": "Project",
-      "workingDirectory": "$(SolutionDir)"
-    }
-  }
-}
