@@ -12,8 +12,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Authenticate Git
-        run: git config --global url."https://user:${{ secrets.GITHUB_TOKEN }}@github".insteadOf https://github
+      - name: Setup Git
+        run: |
+          git config --global url."https://user:${{ secrets.GITHUB_TOKEN }}@github".insteadOf https://github
+          git config user.name github-actions
+          git config user.email github-actions@github.com
 
       - name: Run release script
         shell: pwsh
