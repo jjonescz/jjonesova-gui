@@ -9,13 +9,9 @@ $ErrorActionPreference = "Stop"
 Write-Output "Working directory: $pwd"
 
 # Find MSBuild.
-if (-Not (Test-Path msbuild)) {
-    $msBuildPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" `
-        -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe `
-        -prerelease | select-object -first 1
-} else {
-    $msBuildPath = msbuild
-}
+$msBuildPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" `
+    -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe `
+    -prerelease | select-object -first 1
 Write-Output "MSBuild: $((Get-Command $msBuildPath).Path)"
 
 # Load current Git tag.
