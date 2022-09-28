@@ -25,7 +25,8 @@ Write-Output "Version: $version"
 
 # Clean output directory.
 $projDir = "src/JonesovaGui"
-$outDir = "$projDir/bin/publish"
+$publishDir = "bin/publish"
+$outDir = "$projDir/$publishDir"
 if (Test-Path $outDir) {
     Remove-Item -Path $outDir -Recurse
 }
@@ -37,7 +38,8 @@ try {
     dotnet restore -r win-x64
     Write-Output "Publishing:"
     & $msBuildPath /target:publish /p:PublishProfile=ClickOnceProfile `
-        /p:ApplicationVersion=$version /p:Configuration=Release
+        /p:ApplicationVersion=$version /p:Configuration=Release `
+        /p:PublishDir=$publishDir /p:PublishUrl=$publishDir
 }
 finally {
     Pop-Location
