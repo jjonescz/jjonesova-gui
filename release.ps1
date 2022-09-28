@@ -8,15 +8,6 @@ $ErrorActionPreference = "Stop"
 
 Write-Output "Working directory: $pwd"
 
-# Find MSBuild.
-if (-Not (Test-Path msbuild)) {
-    $msBuildPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" `
-        -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe `
-        -prerelease | select-object -first 1
-} else {
-    $msBuildPath = msbuild
-}
-
 # Load current Git tag.
 $tag = $(git describe --tags)
 Write-Output "Tag: $tag"
@@ -39,7 +30,7 @@ try {
     Write-Output "Restoring:"
     dotnet restore -r win-x64
     Write-Output "Publishing:"
-    & $msBuildPath /v:m /target:publish /p:PublishProfile=ClickOnceProfile `
+    dotnet msbuild /v:m /target:publish /p:PublishProfile=ClickOnceProfile `
         /p:ApplicationVersion=$version
 }
 finally {
