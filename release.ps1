@@ -36,7 +36,7 @@ try {
     Write-Output "Restoring:"
     dotnet restore -r win-x64
     Write-Output "Publishing:"
-    & $msBuildPath /v:m /target:publish /p:PublishProfile=ClickOnceProfile `
+    & $msBuildPath /target:publish /p:PublishProfile=ClickOnceProfile `
         /p:ApplicationVersion=$version /p:Configuration=Release
 }
 finally {
