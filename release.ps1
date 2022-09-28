@@ -16,6 +16,7 @@ if (-Not (Test-Path msbuild)) {
 } else {
     $msBuildPath = msbuild
 }
+Write-Output "MSBuild: $((Get-Command $msBuildPath).Path)"
 
 # Load current Git tag.
 $tag = $(git describe --tags)
