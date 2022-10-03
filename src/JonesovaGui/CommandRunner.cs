@@ -1,5 +1,4 @@
 ﻿using CliWrap;
-using LibGit2Sharp;
 using System;
 using System.Threading;
 using System.Threading.Tasks;

@@ -9,7 +9,6 @@
   <ItemGroup>
     <PackageReference Include="CliWrap" Version="3.5.0" />
     <PackageReference Include="GitForWindows" Version="2.37.3" />
-    <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
     <PackageReference Include="Slugify.Core" Version="3.0.0" />
     <PackageReference Include="Tomlyn" Version="0.15.0" />
     <PackageReference Include="YamlDotNet" Version="11.2.1" />

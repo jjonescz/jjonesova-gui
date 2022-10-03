@@ -92,7 +92,6 @@ namespace JonesovaGui
                     MessageBoxResult.Cancel);
                 if (result == MessageBoxResult.OK)
                 {
-                    git.Init();
                     await git.ResetAsync(bare: true);
                 }
             }

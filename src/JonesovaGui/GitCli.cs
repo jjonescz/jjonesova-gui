@@ -1,8 +1,6 @@
 ﻿using CliWrap;
-using LibGit2Sharp;
 using System;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace JonesovaGui
@@ -66,9 +64,14 @@ namespace JonesovaGui
             await GitCommand.AddArguments("pull", "--ff-only", "--progress").RunAsync(runner);
         }
 
+        public bool IsValidRepository()
+        {
+            return Directory.Exists(Path.Join(LocalDirectory.FullName, ".git"));
+        }
+
         public async Task CloneOrPullAsync(bool replace = false)
         {
-            if (Directory.Exists(Path.Join(LocalDirectory.FullName, ".git")))
+            if (IsValidRepository())
             {
                 await PullAsync();
             }
@@ -131,6 +134,16 @@ namespace JonesovaGui
         public async Task PushAsync()
         {
             await GitCommand.AddArguments("push", "--progress").RunAsync(runner);
+        }
+
+        public async Task ResetAsync()
+        {
+            await GitCommand.AddArguments("reset", "--hard").RunAsync(runner);
+        }
+
+        public async Task CleanAsync()
+        {
+            await GitCommand.AddArguments("clean", "-fxd").RunAsync(runner);
         }
     }
 }

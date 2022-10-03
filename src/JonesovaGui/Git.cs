@@ -1,24 +1,28 @@
 ﻿using CliWrap.Exceptions;
-using LibGit2Sharp;
 using System;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
 namespace JonesovaGui
 {
+    public enum LogLevel
+    {
+        Error,
+        Warning,
+        Info,
+        Debug
+    }
+
     public partial class MainWindow
     {
         class Git
         {
             private const string repoUrl = "https://github.com/jjonescz/jjonesova";
-            private readonly string configPath;
             private readonly MainWindow window;
             private readonly GitCli git;
-            private Repository repo;
             private bool pushing;
             private Action<LogLevel, string> gitCliHandler;
 
@@ -30,33 +34,12 @@ namespace JonesovaGui
                     (logLevel, line) => gitCliHandler?.Invoke(logLevel, line));
                 ConfigCli(git);
 
-                GlobalSettings.LogConfiguration = new LogConfiguration(LogLevel.Trace,
-                    (level, message) => Log.Write(level, "Git", message));
-
-                // Set configuration. We create separate file instead of storing
-                // it in `.git/config` so that it takes effect even when pulling
-                // the repository for the first time.
-                configPath = Path.Combine(Log.RootPath, ".gitconfig");
-                File.WriteAllText(configPath, null); // Create the file.
-                using (var config = Configuration.BuildFrom(configPath))
-                {
-                    ConfigLib(config);
-                }
-                GlobalSettings.SetConfigSearchPaths(ConfigurationLevel.Global, Log.RootPath);
-
                 window.loginButton.Click += LoginButton_Click;
                 window.backupButton.Click += BackupButton_Click;
                 window.restoreButton.Click += RestoreButton_Click;
                 window.publishButton.Click += PublishButton_Click;
             }
 
-            // IMPORTANT: Keep these two consistent.
-            private static void ConfigLib(Configuration config)
-            {
-                config.Set("core.symlinks", false);
-                config.Set("core.autocrlf", true);
-                config.Set("core.longpaths", true);
-            }
             private static void ConfigCli(GitCli git)
             {
                 git.AddConfig("core.symlinks", "false");
@@ -95,11 +78,6 @@ namespace JonesovaGui
                 }
             }
 
-            public void Init()
-            {
-                repo = new Repository(window.repoPath);
-            }
-
             private async Task<bool> TryUpdateAsync()
             {
                 if (string.IsNullOrWhiteSpace(window.tokenBox.Text)) return false;
@@ -107,14 +85,13 @@ namespace JonesovaGui
                 Directory.CreateDirectory(window.repoPath);
                 try
                 {
-                    if (!Repository.IsValid(window.repoPath))
+                    if (!git.IsValidRepository())
                     {
                         // Clone repository.
                         Log.Warn("Git", $"Invalid repo at {window.repoPath}; will clone");
                         Directory.Delete(window.repoPath, recursive: true);
                         if (await CloneAsync())
                         {
-                            Init();
                             Log.Info("Git", $"Cloned at {window.repoPath}");
                         }
                     }
@@ -122,11 +99,10 @@ namespace JonesovaGui
                     {
                         // Pull repository.
                         Log.Info("Git", $"Repo at {window.repoPath} valid; will pull");
-                        Init();
                         if (!await PullAsync()) return false;
                     }
                 }
-                catch (LibGit2SharpException e)
+                catch (CommandExecutionException e)
                 {
                     Log.Error("Git", $"Update failed: {e}");
                     return false;
@@ -203,20 +179,18 @@ namespace JonesovaGui
 
             public async Task ResetAsync(bool bare = false)
             {
-                var status = repo.RetrieveStatus();
-                var changes = status.Except(status.Ignored).Count();
                 var result = MessageBox.Show(window,
-                    $"Změny v {changes} souborech od předchozí zálohy (nebo předchozího zveřejnění) budou zahozeny.",
+                    "Změny od předchozí zálohy (nebo předchozího zveřejnění) budou zahozeny.",
                     "Obnovit předchozí zálohu",
                     MessageBoxButton.OKCancel,
                     MessageBoxImage.Warning,
                     MessageBoxResult.Cancel);
                 if (result == MessageBoxResult.OK)
                 {
-                    Log.Info("Git", $"Resetting repository ({changes} changes)");
-                    repo.Reset(ResetMode.Hard);
-                    repo.RemoveUntrackedFiles();
-                    Log.Debug("Git", $"Repository at commit {repo.Head.Tip.Sha}");
+                    Log.Info("Git", "Resetting repository");
+                    await git.ResetAsync();
+                    await git.CleanAsync();
+                    Log.Debug("Git", "Repository reset");
 
                     // Avoid updating UI when resetting the repository before
                     // app is completely loaded (i.e., after error occurred
@@ -243,7 +217,7 @@ namespace JonesovaGui
             private async Task CommitAsync()
             {
                 Log.Info("Git", "Committing changes");
-                Commands.Stage(repo, "*");
+                await git.AddAllAsync();
                 await git.CommitAsync("Apply changes from admin GUI");
                 Log.Debug("Git", "Committed");
                 await RefreshStatusAsync();
