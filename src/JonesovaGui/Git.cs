@@ -1,4 +1,5 @@
-﻿using LibGit2Sharp;
+﻿using CliWrap.Exceptions;
+using LibGit2Sharp;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -14,14 +15,21 @@ namespace JonesovaGui
     {
         class Git
         {
+            private const string repoUrl = "https://github.com/jjonescz/jjonesova";
             private readonly string configPath;
             private readonly MainWindow window;
+            private readonly GitCli git;
             private Repository repo;
             private bool pushing;
+            private Action<LogLevel, string> gitCliHandler;
 
             public Git(MainWindow window)
             {
                 this.window = window;
+                
+                git = new GitCli(new Uri(repoUrl), new DirectoryInfo(window.repoPath),
+                    (logLevel, line) => gitCliHandler?.Invoke(logLevel, line));
+                ConfigCli(git);
 
                 GlobalSettings.LogConfiguration = new LogConfiguration(LogLevel.Trace,
                     (level, message) => Log.Write(level, "Git", message));
@@ -33,9 +41,7 @@ namespace JonesovaGui
                 File.WriteAllText(configPath, null); // Create the file.
                 using (var config = Configuration.BuildFrom(configPath))
                 {
-                    config.Set("core.symlinks", false);
-                    config.Set("core.autocrlf", true);
-                    config.Set("core.longpaths", true);
+                    ConfigLib(config);
                 }
                 GlobalSettings.SetConfigSearchPaths(ConfigurationLevel.Global, Log.RootPath);
 
@@ -43,6 +49,22 @@ namespace JonesovaGui
                 window.backupButton.Click += BackupButton_Click;
                 window.restoreButton.Click += RestoreButton_Click;
                 window.publishButton.Click += PublishButton_Click;
+            }
+
+            // IMPORTANT: Keep these two consistent.
+            private static void ConfigLib(Configuration config)
+            {
+                config.Set("core.symlinks", false);
+                config.Set("core.autocrlf", true);
+                config.Set("core.longpaths", true);
+            }
+            private static void ConfigCli(GitCli git)
+            {
+                git.AddConfig("core.symlinks", "false");
+                git.AddConfig("core.autocrlf", "true");
+                git.AddConfig("core.longpaths", "true");
+                git.AddUserName("Admin GUI");
+                git.AddUserEmail("admin@jjonesova.cz");
             }
 
             public async Task UpdateAsync()
@@ -91,16 +113,11 @@ namespace JonesovaGui
                         // Clone repository.
                         Log.Warn("Git", $"Invalid repo at {window.repoPath}; will clone");
                         Directory.Delete(window.repoPath, recursive: true);
-                        await Task.Run(() => Repository.Clone("https://github.com/jjonescz/jjonesova", window.repoPath, new CloneOptions
+                        if (await CloneAsync())
                         {
-                            CredentialsProvider = Credentials,
-                            OnProgress = p => Status("Přihlašování", p),
-                            OnTransferProgress = p => Status("Přihlašování", "Stahování", p),
-                            OnCheckoutProgress = (p, c, t) => Status("Přihlašování", $"Rozbalování: {(double)c / t:p}"),
-                            RecurseSubmodules = true
-                        }));
-                        Init();
-                        Log.Info("Git", $"Cloned at {window.repoPath}");
+                            Init();
+                            Log.Info("Git", $"Cloned at {window.repoPath}");
+                        }
                     }
                     else
                     {
@@ -119,50 +136,56 @@ namespace JonesovaGui
                 return true;
             }
 
-            private async Task<bool> PullAsync()
+            private async Task<bool> GitCommandWithProgressAsync(string name, string title, Func<Task> action)
             {
-                Log.Debug("Git", "Starting pulling");
-                var result = await Task.Run(() => Commands.Pull(repo, GetSignature(), new PullOptions
+                Log.Debug("Git", $"{name} started");
+
+                gitCliHandler = (level, line) =>
                 {
-                    FetchOptions = new FetchOptions
+                    if (!string.IsNullOrWhiteSpace(line))
                     {
-                        CredentialsProvider = Credentials,
-                        OnProgress = p => Status("Přihlašování", p),
-                        OnTransferProgress = p => Status("Přihlašování", "Stahování", p)
+                        Status(title, line);
                     }
-                }));
-                if (result.Status == MergeStatus.Conflicts)
+                };
+                try
                 {
-                    Log.Error("Git", $"Pull conflicts with merge commit {result.Commit?.Sha}");
-                    window.loginStatus.Content = "Konflikt v příchozích a aktuálních změnách";
-                    window.loginStatus.Foreground = Brushes.DarkRed;
-                    window.tokenBox.Visibility = Visibility.Collapsed;
+                    await Task.Run(action);
+                }
+                catch (CommandExecutionException e)
+                {
+                    Log.Error("Git", $"{name} failed: {e}");
                     return false;
                 }
-                Log.Debug("Git", $"Pulled with status {result.Status} with merge commit {result.Commit?.Sha}");
+                finally
+                {
+                    gitCliHandler = null;
+                }
+
+                Log.Debug("Git", $"{name} finished");
                 return true;
+            }
+
+            private async Task<bool> CloneAsync()
+            {
+                return await GitCommandWithProgressAsync("Clone", "Přihlašování",
+                    async () => await git.CloneAsync());
+            }
+
+            private async Task<bool> PullAsync()
+            {
+                return await GitCommandWithProgressAsync("Clone", "Přihlašování",
+                    async () => await git.PullAsync());
             }
 
             private async Task<bool> PushAsync()
             {
-                Log.Debug("Git", "Starting pushing");
-                PushStatusError error = null;
-                await Task.Run(() => repo.Network.Push(repo.Head, new PushOptions
+                if (!await GitCommandWithProgressAsync("Clone", "Nahrávání",
+                    async () => await git.PushAsync()))
                 {
-                    CredentialsProvider = Credentials,
-                    OnPackBuilderProgress = (s, c, t) => Status("Nahrávání", $"Zabalování {s}: {(double)c / t:p}"),
-                    OnPushTransferProgress = (c, t, b) => Status("Nahrávání", $"Přenos: {(double)c / t:p}"),
-                    OnPushStatusError = e => error = e
-                }));
-                if (error != null)
-                {
-                    Log.Error("Git", $"Publish failed (reference {error.Reference}): {error.Message}");
-                    window.loginStatus.Content = $"Nahrávání selhalo: {error.Message}";
                     window.loginStatus.Foreground = Brushes.DarkRed;
                     window.tokenBox.Visibility = Visibility.Collapsed;
                     return false;
                 }
-                Log.Debug("Git", $"Pushed successfully");
                 return true;
             }
 
@@ -177,25 +200,6 @@ namespace JonesovaGui
                     window.tokenBox.Visibility = Visibility.Collapsed;
                 });
                 return true;
-            }
-
-            private bool Status(string title, string subtitle, TransferProgress p)
-            {
-                return Status(title, $"{subtitle}: {(double)p.ReceivedObjects / p.TotalObjects:p}");
-            }
-
-            private Credentials Credentials(string url, string usernameFromUrl, SupportedCredentialTypes types)
-            {
-                return new UsernamePasswordCredentials
-                {
-                    Username = "jjonescz",
-                    Password = window.Dispatcher.Invoke(() => window.tokenBox.Text)
-                };
-            }
-
-            private Signature GetSignature()
-            {
-                return new Signature("Admin GUI", "admin@jjonesova.cz", DateTimeOffset.Now);
             }
 
             public void Reset(bool bare = false)
@@ -231,14 +235,18 @@ namespace JonesovaGui
             {
                 _ = UpdateAsync();
             }
-
-            // WARNING: This is called also before publishing, so it must not be `async`!
+            
             private void BackupButton_Click(object sender, RoutedEventArgs e)
+            {
+                _ = CommitAsync();
+            }
+
+            private async Task CommitAsync()
             {
                 Log.Info("Git", "Committing changes");
                 Commands.Stage(repo, "*");
-                var commit = repo.Commit("Apply changes from admin GUI", GetSignature(), GetSignature());
-                Log.Debug("Git", $"Committed as {commit.Sha}");
+                await git.CommitAsync("Apply changes from admin GUI");
+                Log.Debug("Git", "Committed");
                 RefreshStatus();
                 window.backupButton.Header = "✔ Zálohováno";
             }
@@ -252,7 +260,9 @@ namespace JonesovaGui
             {
                 // Backup (i.e., commit) first.
                 if (window.backupButton.IsEnabled)
-                    BackupButton_Click(this, null);
+                {
+                    await CommitAsync();
+                }
 
                 window.publishButton.IsEnabled = false;
                 window.publishButton.Content = "⌛ Zveřejňování...";

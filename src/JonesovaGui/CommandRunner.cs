@@ -1,5 +1,6 @@
 ﻿using CliWrap;
 using LibGit2Sharp;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,15 +13,18 @@ namespace JonesovaGui
     {
         private readonly PipeTarget standardOutput, standardError;
 
-        public CommandRunner()
+        public CommandRunner(Action<LogLevel, string> handler)
         {
-            standardOutput = CreatePipeTarget(LogLevel.Info);
-            standardError = CreatePipeTarget(LogLevel.Warning);
+            standardOutput = CreatePipeTarget(LogLevel.Info, handler);
+            standardError = CreatePipeTarget(LogLevel.Warning, handler);
 
-            PipeTarget CreatePipeTarget(LogLevel logLevel)
+            static PipeTarget CreatePipeTarget(LogLevel logLevel, Action<LogLevel, string> handler)
             {
                 return PipeTarget.ToDelegate(line =>
-                    Log.Write(logLevel, "Command", $"> {line}"));
+                {
+                    Log.Write(logLevel, "Command", $"> {line}");
+                    handler(logLevel, line);
+                });
             }
         }
 
@@ -38,6 +42,10 @@ namespace JonesovaGui
     class SynchronizedCommandRunner : CommandRunner
     {
         private readonly SemaphoreSlim semaphore = new(1, 1);
+
+        public SynchronizedCommandRunner(Action<LogLevel, string> handler) : base(handler)
+        {
+        }
 
         public override async Task<CommandResult> RunAsync(Command command)
         {

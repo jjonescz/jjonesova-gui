@@ -1,4 +1,5 @@
 ﻿using CliWrap;
+using LibGit2Sharp;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -7,12 +8,14 @@ namespace JonesovaGui
 {
     class GitCli
     {
-        private readonly CommandRunner runner = new SynchronizedCommandRunner();
+        private readonly CommandRunner runner;
 
-        public GitCli(Uri remoteUrl, DirectoryInfo localDirectory)
+        public GitCli(Uri remoteUrl, DirectoryInfo localDirectory,
+            Action<LogLevel, string> handler)
         {
             RemoteUrl = remoteUrl;
             LocalDirectory = localDirectory;
+            this.runner = new SynchronizedCommandRunner(handler);
 
             GitCommand = Cli.Wrap("git")
                 .WithWorkingDirectory(LocalDirectory.FullName);
@@ -45,14 +48,21 @@ namespace JonesovaGui
         public async Task CloneAsync()
         {
             await GitCommand
-                .AddArguments("clone", RemoteUrl.ToString(), LocalDirectory.Name)
+                .AddArguments(
+                    "clone",
+                    "--progress",
+                    "--recurse-submodules",
+                    "--depth=1",
+                    "--shallow-submodules",
+                    RemoteUrl.ToString(),
+                    LocalDirectory.Name)
                 .WithWorkingDirectory(LocalDirectory.Parent.FullName)
                 .RunAsync(runner);
         }
 
         public async Task PullAsync()
         {
-            await GitCommand.AddArguments("pull", "--ff-only").RunAsync(runner);
+            await GitCommand.AddArguments("pull", "--ff-only", "--progress").RunAsync(runner);
         }
 
         public async Task CloneOrPullAsync(bool replace = false)
@@ -109,7 +119,7 @@ namespace JonesovaGui
 
         public async Task PushAsync()
         {
-            await GitCommand.AddArguments("push").RunAsync(runner);
+            await GitCommand.AddArguments("push", "--progress").RunAsync(runner);
         }
     }
 }
