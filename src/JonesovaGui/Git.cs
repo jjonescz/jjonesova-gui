@@ -303,7 +303,8 @@ namespace JonesovaGui
 
                 if (!pushing)
                 {
-                    var pushDirty = await git.AheadByAsync() > 0 && !window.saveButton.IsEnabled;
+                    var pushDirty = dirty ||
+                        (await git.AheadByAsync() > 0 && !window.saveButton.IsEnabled);
                     if (pushDirty && !window.publishButton.IsEnabled)
                     {
                         window.publishButton.Content = "Zveřejnit";
