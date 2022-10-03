@@ -2,6 +2,7 @@
 using LibGit2Sharp;
 using System;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace JonesovaGui
@@ -96,7 +97,7 @@ namespace JonesovaGui
             await GitCommand.AddArguments("add", "-A").RunAsync(runner);
         }
 
-        public async Task<bool> HasStagedChanges()
+        public async Task<bool> HasChangesAsync()
         {
             var result = await GitCommand
                 .AddArguments("diff-index", "--quiet", "HEAD")
@@ -108,6 +109,16 @@ namespace JonesovaGui
                 0 => false,
                 _ => throw new InvalidOperationException($"Unrecognized exit code {result.ExitCode}")
             };
+        }
+
+        public async Task<int> AheadByAsync()
+        {
+            var numLines = 0;
+            await GitCommand
+                .AddArguments("log", "--oneline", "@{u}..")
+                .WithStandardOutputPipe(PipeTarget.ToDelegate(_ => numLines++))
+                .RunAsync(runner, noInterceptPipes: true);
+            return numLines;
         }
 
         public async Task CommitAsync(string message)

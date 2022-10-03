@@ -10,9 +10,10 @@ namespace JonesovaGui
     static class CommandUtil
     {
         public static Task<CommandResult> RunAsync(
-            this Command command, CommandRunner runner)
+            this Command command, CommandRunner runner,
+            bool noInterceptPipes = false)
         {
-            return runner.RunAsync(command);
+            return runner.RunAsync(command, noInterceptPipes: noInterceptPipes);
         }
 
         public static Command AddArguments(this Command command, string arguments)

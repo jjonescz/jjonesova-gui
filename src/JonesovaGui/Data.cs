@@ -130,7 +130,7 @@ namespace JonesovaGui
                         }
                     }
                 }
-                
+
                 // Load contact info.
                 // TODO: Better would be to traverse syntax tree to find the correct node.
                 config = Toml.Parse(File.ReadAllText(configPath), configPath);
@@ -611,7 +611,7 @@ namespace JonesovaGui
                     // Refresh content.
                     Load();
 
-                    window.git.RefreshStatus();
+                    _ = window.git.RefreshStatusAsync();
                 });
             }
 

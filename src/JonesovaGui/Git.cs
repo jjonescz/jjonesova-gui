@@ -4,7 +4,6 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -26,7 +25,7 @@ namespace JonesovaGui
             public Git(MainWindow window)
             {
                 this.window = window;
-                
+
                 git = new GitCli(new Uri(repoUrl), new DirectoryInfo(window.repoPath),
                     (logLevel, line) => gitCliHandler?.Invoke(logLevel, line));
                 ConfigCli(git);
@@ -85,7 +84,7 @@ namespace JonesovaGui
                 {
                     window.loginStatus.Content = "Přihlášení úspěšné";
                     window.loginStatus.Foreground = Brushes.Black;
-                    window.Init();
+                    await window.InitAsync();
                 }
                 else
                 {
@@ -202,7 +201,7 @@ namespace JonesovaGui
                 return true;
             }
 
-            public void Reset(bool bare = false)
+            public async Task ResetAsync(bool bare = false)
             {
                 var status = repo.RetrieveStatus();
                 var changes = status.Except(status.Ignored).Count();
@@ -224,7 +223,7 @@ namespace JonesovaGui
                     // previously).
                     if (!bare)
                     {
-                        RefreshStatus();
+                        await RefreshStatusAsync();
                         window.restoreButton.Header = "✔ Obnoveno";
                         window.data.Load();
                     }
@@ -235,7 +234,7 @@ namespace JonesovaGui
             {
                 _ = UpdateAsync();
             }
-            
+
             private void BackupButton_Click(object sender, RoutedEventArgs e)
             {
                 _ = CommitAsync();
@@ -247,13 +246,13 @@ namespace JonesovaGui
                 Commands.Stage(repo, "*");
                 await git.CommitAsync("Apply changes from admin GUI");
                 Log.Debug("Git", "Committed");
-                RefreshStatus();
+                await RefreshStatusAsync();
                 window.backupButton.Header = "✔ Zálohováno";
             }
 
             private void RestoreButton_Click(object sender, RoutedEventArgs e)
             {
-                Reset();
+                _ = ResetAsync();
             }
 
             private async void PublishButton_Click(object sender, RoutedEventArgs e)
@@ -270,7 +269,7 @@ namespace JonesovaGui
 
                 var result = await PushAsync();
                 pushing = false;
-                RefreshStatus();
+                await RefreshStatusAsync();
                 if (result)
                 {
                     window.loginStatus.Content = "Nahrání úspěšné";
@@ -284,13 +283,13 @@ namespace JonesovaGui
                 }
             }
 
-            public void RefreshStatus()
+            public async Task RefreshStatusAsync()
             {
                 // Note that all these buttons are enabled only if changes are saved.
                 // IMPORTANT: Keep consistent with `Data.Changed`.
 
-                var status = repo.RetrieveStatus();
-                var dirty = status.IsDirty && !window.saveButton.IsEnabled;
+                var hasChanges = await git.HasChangesAsync();
+                var dirty = hasChanges && !window.saveButton.IsEnabled;
                 if (dirty && !window.restoreButton.IsEnabled)
                 {
                     window.restoreButton.Header = "Obnovit předchozí zálohu...";
@@ -304,7 +303,7 @@ namespace JonesovaGui
 
                 if (!pushing)
                 {
-                    var pushDirty = repo.Head.TrackingDetails.AheadBy > 0 && !window.saveButton.IsEnabled;
+                    var pushDirty = await git.AheadByAsync() > 0 && !window.saveButton.IsEnabled;
                     if (pushDirty && !window.publishButton.IsEnabled)
                     {
                         window.publishButton.Content = "Zveřejnit";
@@ -312,18 +311,10 @@ namespace JonesovaGui
                     window.publishButton.IsEnabled = pushDirty;
                 }
 
-                // HACK: Get string representation of repository status.
-                var statusString = status.GetType()
-                    .GetProperty("DebuggerDisplay",
-                        BindingFlags.NonPublic | BindingFlags.Instance)
-                    .GetValue(status);
+                Log.Debug("Git", $"Has changes: {hasChanges}");
 
-                Log.Debug("Git", $"Status: {statusString}; " +
-                    $"dirty: {status.IsDirty}; " +
-                    $"ahead by {repo.Head.TrackingDetails.AheadBy}; " +
-                    $"behind by {repo.Head.TrackingDetails.BehindBy}");
-
-                // Indicate changed files in UI.
+                // TODO: Indicate changed files in UI.
+#if false
                 foreach (var album in window.data.Albums)
                 {
                     album.Changed = false;
@@ -342,9 +333,10 @@ namespace JonesovaGui
                             image.Changed |= fullPath.Equals(image.FullPath, StringComparison.OrdinalIgnoreCase);
                         }
                     }
-                }
+                }          
                 window.albums.Items.Refresh();
                 window.images.Items.Refresh();
+#endif
             }
         }
     }

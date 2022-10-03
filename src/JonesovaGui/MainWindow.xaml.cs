@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -30,7 +31,7 @@ namespace JonesovaGui
             deploy = new Deploy(this);
         }
 
-        public void Init()
+        public async Task InitAsync()
         {
             // Execute Hugo.
             new Hugo(this).Start();
@@ -40,7 +41,7 @@ namespace JonesovaGui
 
             // Refresh Git status (depends on `data` being loaded, so that it
             // can indicate changed albums and images).
-            git.RefreshStatus();
+            await git.RefreshStatusAsync();
 
             // Detect deployment status.
             deploy.Detect();
@@ -75,7 +76,7 @@ namespace JonesovaGui
             }
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             // If there was an error previously, suggest resetting Git repo.
             if (File.Exists(Log.ErrorStampPath))
@@ -92,7 +93,7 @@ namespace JonesovaGui
                 if (result == MessageBoxResult.OK)
                 {
                     git.Init();
-                    git.Reset(bare: true);
+                    await git.ResetAsync(bare: true);
                 }
             }
 
@@ -102,7 +103,7 @@ namespace JonesovaGui
 
             // Update Git repo. `MainWindow.Init` will be called then by `Git`
             // when login succeeds.
-            _ = git.UpdateAsync();
+            await git.UpdateAsync();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

@@ -28,13 +28,14 @@ namespace JonesovaGui
             }
         }
 
-        public virtual async Task<CommandResult> RunAsync(Command command)
+        public virtual async Task<CommandResult> RunAsync(Command command,
+            bool noInterceptPipes = false)
         {
             Log.Info("Command", $"{command.WorkingDirPath}$ {command}");
-            using var result = command
+            command = noInterceptPipes ? command : command
                 .WithStandardOutputPipe(standardOutput)
-                .WithStandardErrorPipe(standardError)
-                .ExecuteAsync();
+                .WithStandardErrorPipe(standardError);
+            using var result = command.ExecuteAsync();
             return await result.Task;
         }
     }
@@ -47,12 +48,13 @@ namespace JonesovaGui
         {
         }
 
-        public override async Task<CommandResult> RunAsync(Command command)
+        public override async Task<CommandResult> RunAsync(Command command,
+            bool noInterceptPipes = false)
         {
             try
             {
                 await semaphore.WaitAsync();
-                return await base.RunAsync(command);
+                return await base.RunAsync(command, noInterceptPipes: noInterceptPipes);
             }
             finally
             {
