@@ -41,7 +41,7 @@
                         </ContextMenu>
                     </Button.ContextMenu>
                 </Button>
-                <Button x:Name="publishButton" Padding="12,0" Margin="6,0" IsEnabled="False" ToolTip="git pull &amp;&amp; git push">Zveřejnit</Button>
+                <Button x:Name="publishButton" Padding="12,0" Margin="6,0" IsEnabled="False" ToolTip="git push">Zveřejnit</Button>
                 <Label x:Name="deployStatus" Foreground="Gray" ToolTip="Netlify status badge">Čeká...</Label>
                 <Button x:Name="webButton" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="12,0" Margin="6,0"
                         ToolTip="https://jjonesova.cz" Click="webButton_Click">Zobrazit web</Button>
