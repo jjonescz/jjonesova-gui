@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
@@ -29,6 +31,20 @@ namespace JonesovaGui
             git = new Git(this);
             data = new Data(this);
             deploy = new Deploy(this);
+
+            // Log environment variables.
+            Log.Info("Env", string.Join(Environment.NewLine,
+                Environment.GetEnvironmentVariables()
+                    .Cast<DictionaryEntry>()
+                    .Select(x => $"{x.Key}={x.Value}")));
+
+            // Set current version to title bar if available.
+            // See https://github.com/dotnet/deployment-tools/pull/208.
+            var version = Environment.GetEnvironmentVariable("ClickOnce_CurrentVersion");
+            if (version != null)
+            {
+                Title += $" (v{version})";
+            }
         }
 
         public async Task InitAsync()
