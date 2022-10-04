@@ -18,6 +18,7 @@ namespace JonesovaGui
 
             var gitPath = Path.GetFullPath("Assets/git/cmd/git.exe");
             GitCommand = Cli.Wrap(gitPath)
+                .WithEnvironmentVariables(e => e.Set("GIT_TERMINAL_PROMPT", "0"))
                 .WithWorkingDirectory(LocalDirectory.FullName);
         }
 
