@@ -144,7 +144,7 @@ namespace JonesovaGui
 
         public async Task CleanAsync()
         {
-            await GitCommand.AddArguments("clean", "-fxd").RunAsync(runner);
+            await GitCommand.AddArguments("clean", "-fd").RunAsync(runner);
         }
     }
 }
