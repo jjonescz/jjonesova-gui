@@ -1,6 +1,6 @@
 [CmdletBinding(PositionalBinding=$false)]
 param (
-
+    [switch]$OnlyBuild=$false
 )
 
 Set-StrictMode -version 2.0
@@ -48,6 +48,11 @@ try {
 }
 finally {
     Pop-Location
+}
+
+if ($OnlyBuild) {
+    Write-Output "Build finished."
+    exit
 }
 
 # Clone `gh-pages` branch.
