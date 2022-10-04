@@ -9,10 +9,8 @@ namespace JonesovaGui
     {
         private readonly CommandRunner runner;
 
-        public GitCli(Uri remoteUrl, DirectoryInfo localDirectory,
-            Action<LogLevel, string> handler)
+        public GitCli(DirectoryInfo localDirectory, Action<LogLevel, string> handler)
         {
-            RemoteUrl = remoteUrl;
             LocalDirectory = localDirectory;
             this.runner = new SynchronizedCommandRunner(handler);
 
@@ -21,8 +19,7 @@ namespace JonesovaGui
                 .WithEnvironmentVariables(e => e.Set("GIT_TERMINAL_PROMPT", "0"))
                 .WithWorkingDirectory(LocalDirectory.FullName);
         }
-
-        public Uri RemoteUrl { get; }
+        
         public DirectoryInfo LocalDirectory { get; }
         public Command GitCommand { get; set; }
 
@@ -46,7 +43,7 @@ namespace JonesovaGui
             AddConfig("commit.gpgsign", sign ? "true" : "false");
         }
 
-        public async Task CloneAsync()
+        public async Task CloneAsync(string remoteUrl)
         {
             await GitCommand
                 .AddArguments(
@@ -55,10 +52,15 @@ namespace JonesovaGui
                     "--recurse-submodules",
                     "--depth=1",
                     "--shallow-submodules",
-                    RemoteUrl.ToString(),
+                    remoteUrl,
                     LocalDirectory.Name)
                 .WithWorkingDirectory(LocalDirectory.Parent.FullName)
                 .RunAsync(runner);
+        }
+
+        public async Task SetRemoteUrlAsync(string remoteUrl)
+        {
+            await GitCommand.AddArguments("remote", "set-url", "origin", remoteUrl).RunAsync(runner);
         }
 
         public async Task PullAsync()
@@ -71,10 +73,11 @@ namespace JonesovaGui
             return Directory.Exists(Path.Join(LocalDirectory.FullName, ".git"));
         }
 
-        public async Task CloneOrPullAsync(bool replace = false)
+        public async Task CloneOrPullAsync(string remoteUrl, bool replace = false)
         {
             if (IsValidRepository())
             {
+                await SetRemoteUrlAsync(remoteUrl);
                 await PullAsync();
             }
             else
@@ -93,7 +96,7 @@ namespace JonesovaGui
                     }
                 }
 
-                await CloneAsync();
+                await CloneAsync(remoteUrl);
             }
         }
 

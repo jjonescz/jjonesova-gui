@@ -20,7 +20,6 @@ namespace JonesovaGui
     {
         class Git
         {
-            private const string repoUrl = "https://github.com/jjonescz/jjonesova";
             private readonly MainWindow window;
             private readonly GitCli git;
             private bool pushing;
@@ -30,7 +29,7 @@ namespace JonesovaGui
             {
                 this.window = window;
 
-                git = new GitCli(new Uri(repoUrl), new DirectoryInfo(window.repoPath),
+                git = new GitCli(new DirectoryInfo(window.repoPath),
                     (logLevel, line) => gitCliHandler?.Invoke(logLevel, line));
                 ConfigCli(git);
 
@@ -80,7 +79,8 @@ namespace JonesovaGui
 
             private async Task<bool> TryUpdateAsync()
             {
-                if (string.IsNullOrWhiteSpace(window.tokenBox.Text)) return false;
+                var token = window.tokenBox.Text;
+                if (string.IsNullOrWhiteSpace(token)) return false;
 
                 Directory.CreateDirectory(window.repoPath);
                 try
@@ -90,7 +90,7 @@ namespace JonesovaGui
                         // Clone repository.
                         Log.Warn("Git", $"Invalid repo at {window.repoPath}; will clone");
                         Directory.Delete(window.repoPath, recursive: true);
-                        if (await CloneAsync())
+                        if (await CloneAsync(token))
                         {
                             Log.Info("Git", $"Cloned at {window.repoPath}");
                         }
@@ -99,7 +99,7 @@ namespace JonesovaGui
                     {
                         // Pull repository.
                         Log.Info("Git", $"Repo at {window.repoPath} valid; will pull");
-                        if (!await PullAsync()) return false;
+                        if (!await PullAsync(token)) return false;
                     }
                 }
                 catch (CommandExecutionException e)
@@ -140,16 +140,25 @@ namespace JonesovaGui
                 return true;
             }
 
-            private async Task<bool> CloneAsync()
+            private static string GetRemoteUrl(string token)
             {
-                return await GitCommandWithProgressAsync("Clone", "Přihlašování",
-                    async () => await git.CloneAsync());
+                return $"https://jjonescz:{token}@github.com/jjonescz/jjonesova";
             }
 
-            private async Task<bool> PullAsync()
+            private async Task<bool> CloneAsync(string token)
             {
                 return await GitCommandWithProgressAsync("Clone", "Přihlašování",
-                    async () => await git.PullAsync());
+                    async () => await git.CloneAsync(GetRemoteUrl(token)));
+            }
+
+            private async Task<bool> PullAsync(string token)
+            {
+                return await GitCommandWithProgressAsync("Clone", "Přihlašování",
+                    async () =>
+                    {
+                        await git.SetRemoteUrlAsync(GetRemoteUrl(token));
+                        await git.PullAsync();
+                    });
             }
 
             private async Task<bool> PushAsync()
