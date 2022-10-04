@@ -16,7 +16,8 @@ namespace JonesovaGui
             LocalDirectory = localDirectory;
             this.runner = new SynchronizedCommandRunner(handler);
 
-            GitCommand = Cli.Wrap("git")
+            var gitPath = Path.GetFullPath("Assets/git/cmd/git.exe");
+            GitCommand = Cli.Wrap(gitPath)
                 .WithWorkingDirectory(LocalDirectory.FullName);
         }
 
