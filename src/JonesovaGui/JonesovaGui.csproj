@@ -15,8 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-	<Content Include="Assets\hugo.exe" CopyToOutputDirectory="PreserveNewest" />
-	<Content Include="$(PkgGitForWindows)\tools\**" LinkBase="Assets\git" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Assets\hugo.exe" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="$(PkgGitForWindows)\tools\**" LinkBase="Assets\git" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
