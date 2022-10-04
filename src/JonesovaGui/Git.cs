@@ -90,10 +90,7 @@ namespace JonesovaGui
                         // Clone repository.
                         Log.Warn("Git", $"Invalid repo at {window.repoPath}; will clone");
                         Directory.Delete(window.repoPath, recursive: true);
-                        if (await CloneAsync(token))
-                        {
-                            Log.Info("Git", $"Cloned at {window.repoPath}");
-                        }
+                        if (!await CloneAsync(token)) return false;
                     }
                     else
                     {
@@ -153,7 +150,7 @@ namespace JonesovaGui
 
             private async Task<bool> PullAsync(string token)
             {
-                return await GitCommandWithProgressAsync("Clone", "Přihlašování",
+                return await GitCommandWithProgressAsync("Pull", "Přihlašování",
                     async () =>
                     {
                         await git.SetRemoteUrlAsync(GetRemoteUrl(token));
