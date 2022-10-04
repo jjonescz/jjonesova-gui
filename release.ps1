@@ -37,9 +37,14 @@ try {
     Write-Output "Restoring:"
     dotnet restore -r win-x64
     Write-Output "Publishing:"
+    $msBuildVerbosityArg = "/v:m"
+    if ($env:CI) {
+        $msBuildVerbosityArg = ""
+    }
     & $msBuildPath /target:publish /p:PublishProfile=ClickOnceProfile `
         /p:ApplicationVersion=$version /p:Configuration=Release `
-        /p:PublishDir=$publishDir /p:PublishUrl=$publishDir
+        /p:PublishDir=$publishDir /p:PublishUrl=$publishDir `
+        $msBuildVerbosityArg
 }
 finally {
     Pop-Location
