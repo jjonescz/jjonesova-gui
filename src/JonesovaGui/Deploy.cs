@@ -62,8 +62,8 @@ namespace JonesovaGui
                 var svg = await response.Content.ReadAsStringAsync();
 
                 // Colors can be obtained from
-                // https://github.com/badges/shields/blob/23c0406bedfc6930735e8f5ea75dfe34faf1f290/services/netlify/netlify.service.js#L55-L57
-                // but we used more thorough manual inspection of image in
+                // https://github.com/badges/shields/blob/57ba623fd687b261e91de6bd0842d764b05df74a/services/netlify/netlify.service.js#L57-L60
+                // or through manual inspection of images in
                 // https://docs.netlify.com/monitor-sites/status-badges/.
                 bool HasColor(string color)
                 {
@@ -71,10 +71,10 @@ namespace JonesovaGui
                 }
                 var status = svg switch
                 {
-                    _ when HasColor("#c9eeeb") => DeployStatus.Success,
-                    _ when HasColor("#fed7e2") => DeployStatus.Failed,
-                    _ when HasColor("#ffe4c2") => DeployStatus.Building,
-                    _ when HasColor("#e9eaeb") => DeployStatus.Canceled,
+                    _ when HasColor("#0f4a21") => DeployStatus.Success,
+                    _ when HasColor("#800a20") => DeployStatus.Failed,
+                    _ when HasColor("#603408") => DeployStatus.Building,
+                    _ when HasColor("#181A1C") => DeployStatus.Canceled,
                     _ => DeployStatus.Unknown
                 };
 
