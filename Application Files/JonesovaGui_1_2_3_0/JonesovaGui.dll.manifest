@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
-  <asmv1:assemblyIdentity name="JonesovaGui.exe" version="1.2.2.0" publicKeyToken="0000000000000000" language="cs-CZ" processorArchitecture="msil" type="win32" />
+  <asmv1:assemblyIdentity name="JonesovaGui.exe" version="1.2.3.0" publicKeyToken="0000000000000000" language="cs-CZ" processorArchitecture="msil" type="win32" />
   <application />
   <entryPoint>
-    <assemblyIdentity name="Launcher" version="7.0.0.0" language="neutral" processorArchitecture="msil" />
+    <assemblyIdentity name="Launcher" version="8.0.0.0" language="neutral" processorArchitecture="msil" />
     <commandLine file="Launcher.exe" parameters="" />
   </entryPoint>
   <trustInfo>
@@ -42,14 +42,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Launcher.exe" size="15872">
-      <assemblyIdentity name="Launcher" version="7.0.0.0" language="neutral" processorArchitecture="msil" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Launcher.exe" size="16384">
+      <assemblyIdentity name="Launcher" version="8.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>/rYKq2nuFQ4KAt349MnXCqhewYHSNZ+vFdovmnvpRMg=</dsig:DigestValue>
+        <dsig:DigestValue>MIXxisBWFGdwf31YsFlh8SteErZn/wSAANguLRapn+Y=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -3986,13 +3986,13 @@
       <dsig:DigestValue>FpUf/0enzXLUQxwl6ZWy9DkHUsr9Xj2Z0IbYaRvvMQw=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="JonesovaGui.dll" size="90624">
+  <file name="JonesovaGui.dll" size="91136">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>5PsalIy/HZaU37oB2t9x7pnz6F31/F0L7aLdLOYDr40=</dsig:DigestValue>
+      <dsig:DigestValue>vj4YwEGQMpQ7t9wypa9spk5zF1zhNW+Slq1q/15Q2U0=</dsig:DigestValue>
     </hash>
   </file>
   <file name="JonesovaGui.exe" size="125440">
@@ -4001,7 +4001,7 @@
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>n/yjWDHI3vV98AFDRm6IhplRp3GQxpAHm+cvQyUfYAg=</dsig:DigestValue>
+      <dsig:DigestValue>BsaXQ6gVRfeRje/z2RJK8alPMX6yHcnI0Iqt5HeyobM=</dsig:DigestValue>
     </hash>
   </file>
   <file name="JonesovaGui.runtimeconfig.json" size="382">
